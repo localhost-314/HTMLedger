@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import EditorWidget from '../widgets/EditorWidget';
-import DMARCWidget from '../widgets/DMARCWidget';
+import SnippetWidget from '../widgets/SnippetWidget';
 import WorkspaceWidget from '../widgets/WorkspaceWidget';
 
 export default function Home() {
@@ -25,6 +25,12 @@ export default function Home() {
             </Link>
             <a href="#features" className="btn btn-ghost btn-lg">
               See Features
+            </a>
+          </div>
+          <div className="hero-oss">
+            Open source &middot;{' '}
+            <a href="https://github.com/localhost314/HTMLedger" target="_blank" rel="noopener noreferrer">
+              View on GitHub ↗
             </a>
           </div>
           <div className="hero-stats">
@@ -71,24 +77,25 @@ export default function Home() {
 
           <div className="feature-divider" />
 
-          {/* Feature 2: DMARC — flipped */}
+          {/* Feature 2: Snippet Library — flipped */}
           <div className="feature-row flip">
             <div className="feature-text">
-              <span className="section-label">DMARC Analyzer</span>
-              <h2 className="section-title">Turn DMARC XML Into<br />Instant Clarity</h2>
+              <span className="section-label">Snippet Library</span>
+              <h2 className="section-title">Ready-to-Use Code,<br />Always One Click Away</h2>
               <p className="section-body">
-                Stop squinting at raw XML. HTMLedger auto-detects DMARC aggregate reports
-                and renders them as clean, color-coded cards — policy, source IPs, pass/fail at a glance.
+                Stop rewriting the same boilerplate. HTMLedger's built-in snippet library
+                gives you instant access to HTML5 templates, CSS resets, layout patterns,
+                and more — click to insert, done.
               </p>
               <ul className="feature-list">
-                <li>Auto-detected from XML file content</li>
-                <li>Visual pass / fail color coding</li>
-                <li>Policy, SPF, DKIM results per source IP</li>
-                <li>Try it live — paste your own XML in the widget →</li>
+                <li>HTML5 boilerplate, nav bars, form inputs</li>
+                <li>CSS resets, flexbox, grid, card components</li>
+                <li>Insert with one click — no typing required</li>
+                <li>Add your own custom snippets</li>
               </ul>
             </div>
             <div className="feature-widget-wrap">
-              <DMARCWidget />
+              <SnippetWidget />
             </div>
           </div>
 

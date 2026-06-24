@@ -1,0 +1,125 @@
+.sw-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  font-family: inherit;
+}
+
+.sw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.sw-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sw-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sw-body {
+  display: flex;
+  height: 320px;
+}
+
+.sw-list {
+  width: 175px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 0.4rem 0;
+}
+
+.sw-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.55rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 0.5rem;
+  transition: background 0.15s;
+}
+
+.sw-item:hover { background: rgba(255, 255, 255, 0.04); }
+.sw-item.active { background: rgba(79, 110, 247, 0.12); border-left: 2px solid var(--accent); }
+
+.sw-item-name {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sw-item.active .sw-item-name { color: var(--text-primary); }
+
+.sw-lang {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+}
+
+.sw-code-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sw-code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  flex-shrink: 0;
+}
+
+.sw-code-name {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.sw-copy {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  border-radius: 5px;
+  border: 1px solid var(--border-accent);
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sw-copy:hover { background: rgba(79, 110, 247, 0.12); }
+
+.sw-pre {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem 1.25rem;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  white-space: pre;
+}

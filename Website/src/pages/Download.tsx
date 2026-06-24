@@ -27,7 +27,14 @@ export default function Download() {
             Windows x64 · ~85 MB · NSIS Installer
           </div>
           <div className="dl-smartscreen-note">
-            <strong>Windows SmartScreen warning?</strong> Click <strong>More info</strong> then <strong>Run anyway</strong> — HTMLedger is open source and safe to install.
+            <strong>Seeing a Windows SmartScreen warning?</strong> This is normal for new apps that haven't yet built a reputation with Microsoft. If you're comfortable proceeding, click <strong>More info</strong> then <strong>Run anyway</strong>. HTMLedger is completely open source — if you'd like to review the code before installing, the full source is on{' '}
+            <a href="https://github.com/localhost314/HTMLedger" target="_blank" rel="noopener noreferrer">GitHub</a>.
+            {' '}Still have questions? <a href="/contact">Contact us</a> — we're happy to help.
+          </div>
+          <div className="dl-gh-link">
+            <a href="https://github.com/localhost314/HTMLedger" target="_blank" rel="noopener noreferrer">
+              View source on GitHub ↗
+            </a>
           </div>
         </div>
 

@@ -322,6 +322,13 @@ img { max-width: 100%; height: auto; display: block; }
   flex-wrap: wrap;
   animation: fadeUp 0.5s 0.3s ease both;
 }
+.hero-oss {
+  margin-top: 1.75rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+.hero-oss a { color: var(--accent); }
+.hero-oss a:hover { text-decoration: underline; }
 .hero-stats {
   display: flex;
   gap: 2.5rem;
@@ -382,6 +389,9 @@ img { max-width: 100%; height: auto; display: block; }
 .dl-sub { font-size: 1.0625rem; color: var(--text-secondary); margin-bottom: 2rem; }
 .dl-btn-wrap { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 .dl-meta { font-size: 0.8125rem; color: var(--text-muted); margin-top: 1rem; }
+.dl-gh-link { margin-top: 0.75rem; font-size: 0.875rem; }
+.dl-gh-link a { color: var(--accent); }
+.dl-gh-link a:hover { text-decoration: underline; }
 .dl-smartscreen-note {
   margin-top: 1.25rem;
   padding: 0.75rem 1.25rem;
