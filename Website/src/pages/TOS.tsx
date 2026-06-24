@@ -74,7 +74,7 @@ export default function TOS() {
       <h2>10. Contact</h2>
       <p>
         Questions about these Terms? <a href="/contact">Contact us</a> or email{' '}
-        <a href="mailto:tristanarbet@gmail.com">tristanarbet@gmail.com</a>.
+        <a href="mailto:htmledger@localhost314.com">htmledger@localhost314.com</a>.
       </p>
     </div>
   );

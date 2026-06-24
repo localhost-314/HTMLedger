@@ -24,7 +24,10 @@ export default function Download() {
             </a>
           </div>
           <div className="dl-meta">
-            Windows x64 · ~130 MB · NSIS Installer
+            Windows x64 · ~85 MB · NSIS Installer
+          </div>
+          <div className="dl-smartscreen-note">
+            <strong>Windows SmartScreen warning?</strong> Click <strong>More info</strong> then <strong>Run anyway</strong> — HTMLedger is open source and safe to install.
           </div>
         </div>
 

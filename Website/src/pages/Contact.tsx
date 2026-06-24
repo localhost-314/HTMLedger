@@ -61,7 +61,7 @@ export default function Contact() {
             </p>
             <div className="contact-detail">
               <span>📧</span>
-              <span>tristanarbet@gmail.com</span>
+              <span>htmledger@localhost314.com</span>
             </div>
             <div className="contact-detail" style={{ marginTop: '2rem', flexDirection: 'column', alignItems: 'flex-start', gap: '0.4rem' }}>
               <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>Response time</span>

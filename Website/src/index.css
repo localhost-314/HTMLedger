@@ -382,6 +382,18 @@ img { max-width: 100%; height: auto; display: block; }
 .dl-sub { font-size: 1.0625rem; color: var(--text-secondary); margin-bottom: 2rem; }
 .dl-btn-wrap { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 .dl-meta { font-size: 0.8125rem; color: var(--text-muted); margin-top: 1rem; }
+.dl-smartscreen-note {
+  margin-top: 1.25rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(79, 110, 247, 0.08);
+  border: 1px solid rgba(79, 110, 247, 0.25);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
 .dl-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

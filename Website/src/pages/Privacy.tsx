@@ -68,7 +68,7 @@ export default function Privacy() {
       <h2>8. Your Rights</h2>
       <p>
         You may request deletion of any personal information we hold about you (contact form submissions)
-        by emailing us at <a href="mailto:tristanarbet@gmail.com">tristanarbet@gmail.com</a>. We will
+        by emailing us at <a href="mailto:htmledger@localhost314.com">htmledger@localhost314.com</a>. We will
         fulfill deletion requests within 30 days.
       </p>
 
@@ -81,7 +81,7 @@ export default function Privacy() {
       <h2>10. Contact</h2>
       <p>
         Privacy questions? <a href="/contact">Contact us</a> or email{' '}
-        <a href="mailto:tristanarbet@gmail.com">tristanarbet@gmail.com</a>.
+        <a href="mailto:htmledger@localhost314.com">htmledger@localhost314.com</a>.
       </p>
     </div>
   );
