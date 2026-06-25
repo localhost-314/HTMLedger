@@ -8,6 +8,7 @@ import Download from './pages/Download';
 import Contact from './pages/Contact';
 import TOS from './pages/TOS';
 import Privacy from './pages/Privacy';
+import NotFound from './pages/NotFound';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/tos" element={<TOS />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />
