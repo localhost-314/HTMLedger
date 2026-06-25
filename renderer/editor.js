@@ -50,6 +50,7 @@ require.config({ paths: { vs: '../node_modules/monaco-editor/min/vs' } });
 require(['vs/editor/editor.main'], async function() {
   await Promise.all([initEmmet(), loadAndApplySettings()]);
   defineTheme();
+  if (localStorage.getItem('htmledger-theme') === 'light') monaco.editor.setTheme('vs');
   createEditor();
   loadInitialFile();
   loadWorkspaceSidebar();
@@ -561,19 +562,25 @@ function updatePreview() {
   const frame  = document.getElementById('preview-frame');
   const noPrev = document.getElementById('no-preview');
 
+  const previewSection = document.getElementById('preview-section');
+  const paneResizer   = document.getElementById('pane-resizer');
+
   if (lang === 'html') {
+    previewSection.style.display = ''; paneResizer.style.display = '';
     frame.style.display = 'flex'; noPrev.style.display = 'none';
     frame.src = URL.createObjectURL(new Blob([monacoEditor.getValue()], { type: 'text/html' }));
+    monacoEditor.layout();
   } else if (lang === 'xml') {
+    previewSection.style.display = ''; paneResizer.style.display = '';
     frame.style.display = 'flex'; noPrev.style.display = 'none';
+    monacoEditor.layout();
     const xml = monacoEditor.getValue();
     updateDMARCButton(xml);
     if (dmarcViewOn && isDMARCReport(xml)) renderDMARCPreview(xml);
     else renderXMLPreview(xml);
   } else {
-    frame.style.display = 'none'; noPrev.style.display = 'flex';
-    document.getElementById('no-preview-label').textContent =
-      `No visual preview for .${activeTab.name.split('.').pop()} files`;
+    previewSection.style.display = 'none'; paneResizer.style.display = 'none';
+    monacoEditor.layout();
     updateDMARCButton('');
   }
 }
@@ -1076,9 +1083,15 @@ function showToast(msg) {
   if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
   document.getElementById('btn-theme-toggle')?.addEventListener('click', () => {
     const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    if (next === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    else document.documentElement.removeAttribute('data-theme');
+    if (next === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      monaco.editor.setTheme('vs');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      monaco.editor.setTheme('htmledger');
+    }
     localStorage.setItem('htmledger-theme', next);
+    if (dmarcViewOn && activeTab?.language === 'xml') updatePreview();
   });
 })();
 
