@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const fs = require('fs');
 
@@ -33,7 +34,15 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+  autoUpdater.checkForUpdates().catch(() => {});
 });
+
+autoUpdater.on('update-downloaded', () => {
+  if (mainWindow && !mainWindow.isDestroyed())
+    mainWindow.webContents.send('update-downloaded');
+});
+
+ipcMain.on('install-update', () => autoUpdater.quitAndInstall());
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();

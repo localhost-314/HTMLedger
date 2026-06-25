@@ -22,6 +22,39 @@
   --statusbar-h:   24px;
 }
 
+[data-theme="light"] {
+  --bg-base:       #f0f0f8;
+  --bg-surface:    #ffffff;
+  --bg-card:       #e8e8f4;
+  --bg-sidebar:    #e2e2f0;
+  --bg-topbar:     #e8e8f4;
+  --accent-hover:  #3a5be6;
+  --accent-dim:    rgba(79,110,247,0.12);
+  --text-primary:  #1a1a2e;
+  --text-secondary:#4a4a7a;
+  --text-muted:    #9090b8;
+  --border:        rgba(0,0,0,0.09);
+  --shadow:        0 4px 24px rgba(0,0,0,0.1);
+}
+
+/* ── Update banner ── */
+.update-banner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.45rem 1rem;
+  font-size: 12px;
+  z-index: 9999;
+}
+.update-banner button { background: rgba(255,255,255,0.2); border: none; color: #fff; border-radius: 5px; padding: 3px 10px; font-size: 12px; cursor: pointer; font-weight: 600; }
+.update-banner button:hover { background: rgba(255,255,255,0.35); }
+#btn-dismiss-update { background: none; padding: 3px 6px; opacity: 0.7; }
+
 html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-base); color: var(--text-primary); user-select: none; }
 
 /* ── Titlebar ── */
