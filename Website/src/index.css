@@ -470,6 +470,36 @@ img { max-width: 100%; height: auto; display: block; }
 .legal-page a { color: var(--accent); }
 .legal-page a:hover { text-decoration: underline; }
 
+/* ===== FAQ ===== */
+.faq-section { background: var(--bg-surface); }
+.faq-header { text-align: center; margin-bottom: 3rem; }
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.faq-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: border-color 0.2s;
+}
+.faq-card:hover { border-color: var(--border-accent); }
+.faq-q {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+}
+.faq-a {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
 /* ===== Download CTA strip ===== */
 .cta-strip {
   background: linear-gradient(135deg, rgba(79,110,247,0.12) 0%, rgba(107,133,255,0.06) 100%);

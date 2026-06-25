@@ -125,6 +125,49 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ===== FAQ ===== */}
+      <section className="section faq-section">
+        <div className="container">
+          <div className="faq-header">
+            <span className="section-label">FAQ</span>
+            <h2 className="section-title" style={{ textAlign: 'center' }}>Common Questions</h2>
+          </div>
+          <div className="faq-grid">
+            {[
+              {
+                q: 'Is HTMLedger really free?',
+                a: 'Yes — 100% free for personal and commercial use. No license key, no trial period, no subscription. Ever.',
+              },
+              {
+                q: 'Why does Windows show a SmartScreen warning?',
+                a: 'Windows flags new apps that haven\'t built a reputation with Microsoft yet. Click "More info" → "Run anyway" to proceed. The full source code is on GitHub if you want to verify it yourself.',
+              },
+              {
+                q: 'Will HTMLedger auto-update?',
+                a: 'Yes. HTMLedger checks for updates on startup and notifies you when a new version is available — no manual re-downloading needed.',
+              },
+              {
+                q: 'Does it work offline?',
+                a: 'Completely. The app runs entirely on your machine. No internet connection is required to edit, preview, or save files.',
+              },
+              {
+                q: 'What file types does it support?',
+                a: 'HTML, CSS, JavaScript, XML, and DMARC aggregate reports. Syntax highlighting and Emmet work across all supported types.',
+              },
+              {
+                q: 'Is my code private?',
+                a: 'Absolutely. HTMLedger never connects to any server, never uploads your files, and collects zero data of any kind.',
+              },
+            ].map(({ q, a }) => (
+              <div key={q} className="faq-card">
+                <h3 className="faq-q">{q}</h3>
+                <p className="faq-a">{a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== Download CTA ===== */}
       <section className="cta-strip">
         <div className="container">
