@@ -657,28 +657,52 @@ function renderDMARCPreview(xml) {
       </div>`;
     }).join('');
 
+    const light = document.documentElement.getAttribute('data-theme') === 'light';
+    const t = light ? {
+      body:'#f0f0f8', txt:'#1a1a2e', chip:'#ffffff', chipBorder:'rgba(0,0,0,.08)',
+      cl:'#9090b8', cv:'#1a1a2e', card:'#ffffff', cardBorder:'rgba(0,0,0,.08)',
+      cardTitle:'#4a4a7a', fl:'#9090b8', fv:'#1a1a2e', arRow:'#e8e8f4',
+      arTypeBg:'rgba(79,110,247,.12)', arTypeClr:'#4f6ef7', arDomain:'#2a2a4e',
+      arSel:'#6060a0', scroll:'#b0b0d0', evalLbl:'#4a4a7a',
+    } : {
+      body:'#0f0f1a', txt:'#e8e8f8', chip:'#1c1c32', chipBorder:'rgba(255,255,255,.07)',
+      cl:'#4a4a6a', cv:'#e8e8f8', card:'#1c1c32', cardBorder:'rgba(255,255,255,.07)',
+      cardTitle:'#8888b0', fl:'#4a4a6a', fv:'#e8e8f8', arRow:'#16162a',
+      arTypeBg:'rgba(79,110,247,.2)', arTypeClr:'#8ba0ff', arDomain:'#c8c8e8',
+      arSel:'#8888b0', scroll:'#4a4a6a', evalLbl:'#8888b0',
+    };
+
     const page = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-      *{box-sizing:border-box;margin:0;padding:0}body{background:#0f0f1a;color:#e8e8f8;font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;padding:14px;overflow-y:auto}
-      .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.chip{background:#1c1c32;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:8px 14px;flex:1;min-width:90px}
-      .chip .cl{font-size:10px;color:#4a4a6a;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}.chip .cv{font-size:17px;font-weight:700;color:#e8e8f8}
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{background:${t.body};color:${t.txt};font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;padding:14px;overflow-y:auto}
+      .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+      .chip{background:${t.chip};border:1px solid ${t.chipBorder};border-radius:8px;padding:8px 14px;flex:1;min-width:100px;max-width:200px;overflow:hidden}
+      .chip .cl{font-size:10px;color:${t.cl};text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+      .chip .cv{font-size:17px;font-weight:700;color:${t.cv};overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       .chip.cg .cv{color:#34d399}.chip.cr .cv{color:#f87171}.chip.cb .cv{color:#60a5fa}
-      .card{background:#1c1c32;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;margin-bottom:10px}
+      .card{background:${t.card};border:1px solid ${t.cardBorder};border-radius:10px;padding:14px;margin-bottom:10px}
       .card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-      .card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#8888b0}
-      .grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:12px}
-      .fl{font-size:10px;color:#4a4a6a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}.fv{font-size:13px;color:#e8e8f8;font-weight:500}
-      .mono{font-family:'Cascadia Code',Consolas,monospace;font-size:11px}.eval-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px}
-      .eval-item{display:flex;align-items:center;gap:7px}.eval-lbl{font-size:11px;color:#8888b0}
-      .sec-lbl{font-size:10px;color:#4a4a6a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
-      .ar-list{display:flex;flex-direction:column;gap:5px}.ar-row{display:flex;align-items:center;gap:8px;background:#16162a;border-radius:5px;padding:6px 10px}
-      .ar-type{font-size:10px;font-weight:800;padding:1px 5px;border-radius:3px;background:rgba(79,110,247,.2);color:#8ba0ff;min-width:36px;text-align:center}
-      .ar-domain{flex:1;font-family:monospace;font-size:11px;color:#c8c8e8}.ar-sel{color:#8888b0}
-      .badge{display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:.5px}
+      .card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${t.cardTitle}}
+      .grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+      .field{min-width:0}
+      .fl{font-size:10px;color:${t.fl};text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+      .fv{font-size:13px;color:${t.fv};font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .mono{font-family:'Cascadia Code',Consolas,monospace;font-size:11px}
+      .eval-row{display:flex;gap:10px;flex-wrap:nowrap;margin-bottom:10px;align-items:center}
+      .eval-item{display:flex;align-items:center;gap:6px;white-space:nowrap}
+      .eval-lbl{font-size:11px;color:${t.evalLbl}}
+      .sec-lbl{font-size:10px;color:${t.fl};text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+      .ar-list{display:flex;flex-direction:column;gap:5px}
+      .ar-row{display:flex;align-items:center;gap:8px;background:${t.arRow};border-radius:5px;padding:6px 10px;min-width:0}
+      .ar-type{font-size:10px;font-weight:800;padding:1px 5px;border-radius:3px;background:${t.arTypeBg};color:${t.arTypeClr};min-width:36px;text-align:center;flex-shrink:0}
+      .ar-domain{flex:1;font-family:monospace;font-size:11px;color:${t.arDomain};overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .ar-sel{color:${t.arSel}}
+      .badge{display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:.5px;white-space:nowrap;flex-shrink:0}
       .b-pass{background:rgba(52,211,153,.2);color:#34d399;border:1px solid rgba(52,211,153,.4)}
       .b-fail{background:rgba(248,113,113,.2);color:#f87171;border:1px solid rgba(248,113,113,.4)}
       .b-quarantine{background:rgba(251,191,36,.2);color:#fbbf24;border:1px solid rgba(251,191,36,.4)}
       .b-neutral{background:rgba(136,136,176,.2);color:#8888b0;border:1px solid rgba(136,136,176,.3)}
-      ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#4a4a6a;border-radius:3px}
+      ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:${t.scroll};border-radius:3px}
     </style></head><body>
     <div class="chips">
       <div class="chip cb"><div class="cl">Domain</div><div class="cv" style="font-size:14px">${domain}</div></div>
