@@ -1,6 +1,6 @@
 {
   "name": "htmledger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "localhost:314 | localhost314.com",
   "description": "HTML file viewer, creator, and editor",
   "main": "main.js",
