@@ -467,4 +467,38 @@ function showToast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+/* ── Theme ── */
+function initTheme() {
+  const saved = localStorage.getItem('htmledger-theme') || 'dark';
+  applyTheme(saved);
+  document.getElementById('btn-theme-toggle').addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    localStorage.setItem('htmledger-theme', next);
+  });
+}
+function applyTheme(theme) {
+  if (theme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.getElementById('theme-label').textContent = 'Dark Mode';
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    document.getElementById('theme-label').textContent = 'Light Mode';
+  }
+}
+
+/* ── Auto-update ── */
+function initUpdater() {
+  if (!window.api?.onUpdateDownloaded) return;
+  window.api.onUpdateDownloaded(() => {
+    document.getElementById('update-banner').style.display = 'flex';
+  });
+  document.getElementById('btn-install-update').onclick = () => window.api.installUpdate();
+  document.getElementById('btn-dismiss-update').onclick = () => {
+    document.getElementById('update-banner').style.display = 'none';
+  };
+}
+
 init();
+initTheme();
+initUpdater();

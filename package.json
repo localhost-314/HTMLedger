@@ -19,6 +19,12 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     },
+    "publish": {
+      "provider": "github",
+      "owner": "localhost314",
+      "repo": "HTMLedger",
+      "releaseType": "release"
+    },
     "files": [
       "**/*",
       "!node_modules/.cache"
@@ -29,6 +35,7 @@
     "electron-builder": "^24.13.3"
   },
   "dependencies": {
+    "electron-updater": "^6.8.9",
     "emmet": "^2.4.11",
     "monaco-editor": "^0.55.1"
   }

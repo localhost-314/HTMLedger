@@ -37,4 +37,8 @@ contextBridge.exposeInMainWorld('api', {
   // Settings
   getSettings:  () => ipcRenderer.invoke('get-settings'),
   saveSettings: (s) => ipcRenderer.invoke('save-settings', s),
+
+  // Auto-updater
+  onUpdateDownloaded: (cb) => ipcRenderer.on('update-downloaded', cb),
+  installUpdate: () => ipcRenderer.send('install-update'),
 });

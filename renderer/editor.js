@@ -1045,3 +1045,27 @@ function showToast(msg) {
   clearTimeout(t._t);
   t._t = setTimeout(() => t.classList.remove('show'), 2500);
 }
+
+/* ── Theme ── */
+(function initTheme() {
+  const saved = localStorage.getItem('htmledger-theme') || 'dark';
+  if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  document.getElementById('btn-theme-toggle')?.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    if (next === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    else document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('htmledger-theme', next);
+  });
+})();
+
+/* ── Auto-update ── */
+(function initUpdater() {
+  if (!window.api?.onUpdateDownloaded) return;
+  window.api.onUpdateDownloaded(() => {
+    document.getElementById('update-banner').style.display = 'flex';
+  });
+  document.getElementById('btn-install-update').onclick = () => window.api.installUpdate();
+  document.getElementById('btn-dismiss-update').onclick = () => {
+    document.getElementById('update-banner').style.display = 'none';
+  };
+})();
