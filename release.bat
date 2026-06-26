@@ -67,7 +67,7 @@ echo.
 
 :: ── Step 5: Open GitHub + dist ───────────────────────────
 echo  [5/5] Opening GitHub Releases page and dist folder...
-start "" "https://github.com/localhost314/HTMLedger/releases/new"
+start "" "https://github.com/localhost-314/HTMLedger/releases/new"
 start "" "%~dp0dist"
 echo.
 echo  ================================
