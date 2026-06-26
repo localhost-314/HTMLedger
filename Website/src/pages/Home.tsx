@@ -29,7 +29,7 @@ export default function Home() {
           </div>
           <div className="hero-oss">
             Open source &middot;{' '}
-            <a href="https://github.com/localhost314/HTMLedger" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/localhost-314/HTMLedger" target="_blank" rel="noopener noreferrer">
               View on GitHub ↗
             </a>
           </div>
