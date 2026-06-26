@@ -65,9 +65,10 @@ cls
 echo.
 set /p MSG="  Commit message: "
 echo.
+git remote set-url origin https://github.com/localhost-314/HTMLedger.git
 git add .
 git commit -m "%MSG%"
-git push
+git push origin main
 if %errorlevel% neq 0 (
     echo.
     echo  [ERROR] Push failed. Check output above.
@@ -106,9 +107,10 @@ set /p MSG="  Commit message: "
 echo.
 echo  [2/2] Pushing to GitHub...
 echo.
+git remote set-url origin https://github.com/localhost-314/HTMLedger.git
 git add .
 git commit -m "%MSG%"
-git push
+git push origin main
 if %errorlevel% neq 0 (
     echo.
     echo  [ERROR] Push failed. Check output above.
