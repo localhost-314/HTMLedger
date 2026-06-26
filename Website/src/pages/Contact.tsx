@@ -22,12 +22,13 @@ interface FormState {
 const EMPTY: FormState = { name: '', email: '', subject: '', message: '' };
 
 export default function Contact() {
-  const [form, setForm]       = useState<FormState>(EMPTY);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError]     = useState('');
-  const [siteKey, setSiteKey] = useState('');
-  const [cfToken, setCfToken] = useState('');
+  const [form, setForm]           = useState<FormState>(EMPTY);
+  const [loading, setLoading]     = useState(false);
+  const [success, setSuccess]     = useState(false);
+  const [error, setError]         = useState('');
+  const [siteKey, setSiteKey]     = useState('');
+  const [tsVerified, setTsVerified] = useState(false);
+  const tokenRef    = useRef('');
   const tsContainer = useRef<HTMLDivElement>(null);
   const widgetId    = useRef('');
 
@@ -43,10 +44,10 @@ export default function Contact() {
     const mount = () => {
       if (!window.turnstile || !tsContainer.current) return;
       widgetId.current = window.turnstile.render(tsContainer.current, {
-        sitekey: siteKey,
-        callback:          (t: string) => setCfToken(t),
-        'expired-callback':             () => setCfToken(''),
-        'error-callback':               () => setCfToken(''),
+        sitekey:             siteKey,
+        callback:            (t: string) => { tokenRef.current = t;  setTsVerified(true);  },
+        'expired-callback':  ()           => { tokenRef.current = ''; setTsVerified(false); },
+        'error-callback':    ()           => { tokenRef.current = ''; setTsVerified(false); },
       });
     };
     if (window.turnstile) { mount(); }
@@ -66,7 +67,8 @@ export default function Contact() {
 
   function resetTurnstile() {
     if (widgetId.current && window.turnstile) window.turnstile.reset(widgetId.current);
-    setCfToken('');
+    tokenRef.current = '';
+    setTsVerified(false);
   }
 
   async function submit(e: FormEvent) {
@@ -75,7 +77,7 @@ export default function Contact() {
       setError('Please fill in all required fields.');
       return;
     }
-    if (siteKey && !cfToken) {
+    if (siteKey && !tokenRef.current) {
       setError('Please complete the security check.');
       return;
     }
@@ -86,8 +88,8 @@ export default function Contact() {
         name: form.name, email: form.email, message: form.message,
         platform: 'HTMLedger',
       };
-      if (form.subject.trim()) payload.subject = form.subject.trim();
-      if (cfToken) payload.cfToken = cfToken;
+      if (form.subject.trim())  payload.subject = form.subject.trim();
+      if (tokenRef.current)     payload.cfToken = tokenRef.current;
 
       const res  = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const data = await res.json() as { success?: boolean; code?: number };
@@ -141,7 +143,9 @@ export default function Contact() {
                   value={form.email} onChange={e => change('email', e.target.value)} disabled={loading} />
               </div>
               <div className="form-group">
-                <label htmlFor="cf-subject">Subject <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional)</span></label>
+                <label htmlFor="cf-subject">
+                  Subject <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional)</span>
+                </label>
                 <input id="cf-subject" type="text" className="form-input" placeholder="Bug report, feature request, question…"
                   value={form.subject} onChange={e => change('subject', e.target.value)} disabled={loading} />
               </div>
@@ -160,16 +164,14 @@ export default function Contact() {
               ) : (
                 <button type="submit" className="btn btn-primary"
                   style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
-                  disabled={loading || (!!siteKey && !cfToken)}>
+                  disabled={loading || (!!siteKey && !tsVerified)}>
                   {loading ? 'Sending…' : 'Send Message'}
                 </button>
               )}
             </form>
             <p className="contact-watermark">
               Powered by{' '}
-              <a href="https://localhost314.com" target="_blank" rel="noopener noreferrer">
-                Localhost:314
-              </a>
+              <a href="https://localhost314.com" target="_blank" rel="noopener noreferrer">Localhost:314</a>
             </p>
           </div>
         </div>
