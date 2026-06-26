@@ -1,13 +1,14 @@
 import { useState, type FormEvent } from 'react';
 
+const API = 'https://localhost314.com/api/contact';
+
 interface FormState {
   name: string;
   email: string;
-  subject: string;
   message: string;
 }
 
-const EMPTY: FormState = { name: '', email: '', subject: '', message: '' };
+const EMPTY: FormState = { name: '', email: '', message: '' };
 
 export default function Contact() {
   const [form, setForm] = useState<FormState>(EMPTY);
@@ -22,27 +23,28 @@ export default function Contact() {
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.subject.trim() || !form.message.trim()) {
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       setError('All fields are required.');
       return;
     }
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, platform: 'HTMLedger' }),
       });
-      const data = await res.json() as { success?: boolean; error?: string };
+      const data = await res.json() as { success?: boolean; error?: string; code?: number };
       if (data.success) {
         setSuccess(true);
         setForm(EMPTY);
       } else {
-        setError(data.error ?? 'Something went wrong. Please try again.');
+        const code = data.code ? ` (${data.code})` : '';
+        setError(`Something went wrong${code}. Email us at htmledger@localhost314.com`);
       }
     } catch {
-      setError('Network error. Please try again.');
+      setError('Could not reach the server. Email us at htmledger@localhost314.com');
     } finally {
       setLoading(false);
     }
@@ -91,18 +93,6 @@ export default function Contact() {
                 placeholder="you@example.com"
                 value={form.email}
                 onChange={e => change('email', e.target.value)}
-                disabled={loading}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="cf-subject">Subject</label>
-              <input
-                id="cf-subject"
-                type="text"
-                className="form-input"
-                placeholder="Bug report, feature request, question…"
-                value={form.subject}
-                onChange={e => change('subject', e.target.value)}
                 disabled={loading}
               />
             </div>
