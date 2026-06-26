@@ -1,0 +1,208 @@
+================================================================================
+  LOCALHOST:314 — CONTACT FORM BLOCK  v1.1
+  LLM Integration Prompt
+  Copy and paste this entire file into any AI chat for full context.
+================================================================================
+
+## WHAT THIS IS
+
+A self-contained HTML contact form snippet built by Localhost:314
+(https://localhost314.com). Drop the block into any HTML page and it works.
+Submissions POST to the Localhost:314 API which forwards emails via Resend
+to tristanarbet@gmail.com.
+
+CORS is enabled — the block works on any domain or subdomain, no server
+setup required on the embedding site.
+
+
+## API ENDPOINT
+
+URL:           https://localhost314.com/api/contact
+Method:        POST
+Content-Type:  application/json
+CORS:          Allowed from all origins (*)
+
+Request body (JSON):
+  {
+    "name":     "string  — required",
+    "email":    "string  — required",
+    "message":  "string  — required",
+    "platform": "string  — optional, appended to email subject"
+  }
+
+Success response 200:
+  { "success": true }
+
+Error response 500:
+  { "error": "string", "code": number }
+  (code is the upstream HTTP status, e.g. 403, 422, 500)
+
+
+## CONFIG VARIABLES
+
+Place these in a <script> block ABOVE the pasted block HTML.
+All four are optional — the block has safe defaults for each.
+
+  var L314_WATERMARK = false;
+  // true  → shows small "Powered by Localhost:314" link at the bottom
+  // false → hides it
+  // Rule: false on any Localhost:314-owned site, true everywhere else
+
+  var L314_API = 'https://localhost314.com/api/contact';
+  // The API endpoint. Do not change unless the API moves.
+
+  var L314_PLATFORM = '';
+  // Name of the site/platform embedding the form.
+  // Empty string = no suffix.
+  // e.g. 'Dispatchy'  →  subject: "New message from John on Dispatchy"
+  // e.g. 'Globe'      →  subject: "New message from Jane on Globe"
+
+  var L314_ERROR_CONTACT = 'Reach us directly at contact@localhost314.com';
+  // The tail of every error message shown to the user.
+  // Format on screen: "Error (403) — [this value]"
+  // Examples:
+  //   'Reach us directly at contact@localhost314.com'
+  //   'Email us at support@dispatchy.com'
+  //   'Call us at 555-123-4567'
+  //   'Visit our help center at help.example.com'
+
+
+## EMBEDDING — SUBDOMAIN SITE
+   (e.g. dispatchy.localhost314.com, globe.localhost314.com)
+
+  <script>
+  var L314_WATERMARK     = false;
+  var L314_API           = 'https://localhost314.com/api/contact';
+  var L314_PLATFORM      = 'Dispatchy';
+  var L314_ERROR_CONTACT = 'Email us at support@dispatchy.com';
+  </script>
+  <!-- paste the full contact-block.html content below this line -->
+
+  Notes:
+  - WATERMARK false because it is still a Localhost:314 property
+  - PLATFORM set so emails arrive as "New message from X on Dispatchy"
+  - No server changes needed — CORS already allows *.localhost314.com
+
+
+## EMBEDDING — EXTERNAL DOMAIN SITE
+   (e.g. orderdispatchy.com, globeitinerary.com, any third-party site)
+
+  <script>
+  var L314_WATERMARK     = true;
+  var L314_API           = 'https://localhost314.com/api/contact';
+  var L314_PLATFORM      = 'Dispatchy';
+  var L314_ERROR_CONTACT = 'Email us at support@dispatchy.com';
+  </script>
+  <!-- paste the full contact-block.html content below this line -->
+
+  Notes:
+  - WATERMARK true because it is an external site
+  - CORS is open (*) so no extra headers or proxies needed
+  - The embedding site needs zero backend setup
+
+
+## WHERE TO GET THE BLOCK HTML
+
+File: contact-block.html in the Localhost:314 project public/ folder
+Live URL: https://localhost314.com/contact-block.html
+
+Copy everything in that file and paste it into your page after the
+config <script> block above.
+
+
+## FULL BLOCK CODE
+
+Paste this exactly as-is after your config vars. Do not edit below
+the closing <!-- END CONFIG --> comment.
+
+------------------------------------------------------------------------
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Liter&display=swap" rel="stylesheet">
+
+<style>
+.l314cf *,.l314cf *::before,.l314cf *::after{box-sizing:border-box;margin:0;padding:0}
+.l314cf{font-family:'Liter',system-ui,sans-serif;width:100%;max-width:560px;color:#111}
+.l314cf-group{display:flex;flex-direction:column;gap:5px;margin-bottom:1.25rem}
+.l314cf-group label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#333}
+.l314cf-group input,.l314cf-group textarea{font-family:inherit;font-size:1rem;color:#111;background:#fff;border:2px solid #ddd;border-radius:6px;padding:.7rem .9rem;transition:border-color .15s;width:100%}
+.l314cf-group input:focus,.l314cf-group textarea:focus{outline:none;border-color:#8B0000}
+.l314cf-group textarea{resize:vertical}
+.l314cf-btn{font-family:inherit;font-size:.95rem;font-weight:700;letter-spacing:.04em;color:#fff;background:#8B0000;border:none;border-radius:6px;padding:.8rem 2rem;cursor:pointer;transition:background .15s,opacity .15s}
+.l314cf-btn:hover:not(:disabled){background:#a30000}
+.l314cf-btn:disabled{opacity:.5;cursor:not-allowed}
+.l314cf-status{margin-top:.9rem;font-size:.92rem;font-weight:600;min-height:1.2em}
+.l314cf-status.ok{color:#2e7d32}
+.l314cf-status.err{color:#8B0000}
+.l314cf-wm{margin-top:1.5rem;font-size:.72rem;color:#bbb;text-align:right}
+.l314cf-wm a{color:#bbb;text-decoration:none}
+.l314cf-wm a:hover{text-decoration:underline}
+</style>
+
+<div class="l314cf">
+  <form id="l314cf-form" novalidate>
+    <div class="l314cf-group">
+      <label for="l314cf-name">Name</label>
+      <input type="text" id="l314cf-name" name="name" required autocomplete="name" placeholder="Your name">
+    </div>
+    <div class="l314cf-group">
+      <label for="l314cf-email">Email</label>
+      <input type="email" id="l314cf-email" name="email" required autocomplete="email" placeholder="your@email.com">
+    </div>
+    <div class="l314cf-group">
+      <label for="l314cf-msg">Message</label>
+      <textarea id="l314cf-msg" name="message" rows="5" required placeholder="What's on your mind?"></textarea>
+    </div>
+    <button type="submit" class="l314cf-btn" id="l314cf-btn">Send Message</button>
+    <p class="l314cf-status" id="l314cf-status" aria-live="polite"></p>
+  </form>
+  <p class="l314cf-wm" id="l314cf-wm" style="display:none">
+    Powered by <a href="https://localhost314.com" target="_blank" rel="noopener">Localhost:314</a>
+  </p>
+</div>
+
+<script>
+(function(){
+  if(typeof L314_WATERMARK==='undefined')L314_WATERMARK=false;
+  if(typeof L314_API==='undefined')L314_API='https://localhost314.com/api/contact';
+  if(typeof L314_PLATFORM==='undefined')L314_PLATFORM='';
+  if(typeof L314_ERROR_CONTACT==='undefined')L314_ERROR_CONTACT='Reach us directly at contact@localhost314.com';
+  if(L314_WATERMARK)document.getElementById('l314cf-wm').style.display='block';
+  var form=document.getElementById('l314cf-form');
+  var btn=document.getElementById('l314cf-btn');
+  var stat=document.getElementById('l314cf-status');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=document.getElementById('l314cf-name').value.trim();
+    var email=document.getElementById('l314cf-email').value.trim();
+    var message=document.getElementById('l314cf-msg').value.trim();
+    if(!name||!email||!message){stat.className='l314cf-status err';stat.textContent='Please fill in all fields.';return;}
+    btn.disabled=true;btn.textContent='Sending…';stat.className='l314cf-status';stat.textContent='';
+    var payload={name:name,email:email,message:message};
+    if(L314_PLATFORM)payload.platform=L314_PLATFORM;
+    fetch(L314_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      .then(function(r){return r.json().then(function(j){return{ok:r.ok,body:j};});})
+      .then(function(r){
+        if(r.ok){stat.className='l314cf-status ok';stat.textContent="Message sent! We'll get back to you soon.";form.reset();}
+        else{var code=r.body&&r.body.code?r.body.code:'';stat.className='l314cf-status err';stat.textContent=code?('Error ('+code+') — '+L314_ERROR_CONTACT):(L314_ERROR_CONTACT||'Something went wrong.');}
+      })
+      .catch(function(){stat.className='l314cf-status err';stat.textContent='Could not reach the server — '+L314_ERROR_CONTACT;})
+      .finally(function(){btn.disabled=false;btn.textContent='Send Message';});
+  });
+}());
+</script>
+------------------------------------------------------------------------
+
+
+## TECH STACK CONTEXT (for deeper questions)
+
+- Main site:     React 19 + TypeScript + Vite, hosted on Cloudflare Pages
+- API function:  Cloudflare Pages Function at functions/api/contact.ts
+- Email service: Resend (resend.com), sending domain email.localhost314.com
+- Env var:       RESEND_API_KEY set in Cloudflare Pages → Production secrets
+- Deploy:        run deploy.bat → npm run build + wrangler pages deploy dist --branch production
+
+
+================================================================================
+  END OF PROMPT
+================================================================================

@@ -1,0 +1,46 @@
+================================================================================
+  HTMLedger — New Laptop Setup
+================================================================================
+
+INSTALL FIRST
+  1. Node.js (LTS)  →  https://nodejs.org
+  2. Git            →  https://git-scm.com
+
+RESTORE DEPENDENCIES (run these after copying files over)
+  cd HTMLedger          →  npm install
+  cd HTMLedger\Website  →  npm install
+
+GIT SETUP
+  git config --global user.name  "Your Name"
+  git config --global user.email "your@email.com"
+  Then authenticate GitHub however you normally do (HTTPS browser pop-up or SSH key)
+
+CLOUDFLARE (for website deploys)
+  npx wrangler login
+  (opens browser, log in with your Cloudflare account)
+
+GITHUB TOKEN (required for release.bat to upload the .exe to GitHub Releases)
+  1. Go to https://github.com/settings/tokens
+  2. Generate a classic token with "repo" scope
+  3. Add it as a Windows environment variable named GH_TOKEN:
+     - Search "environment variables" in Start
+     - System Properties → Environment Variables → New (System)
+     - Name: GH_TOKEN   Value: (paste token)
+
+CLOUDFLARE PAGES — RECONNECT TO NEW REPO
+  Since the GitHub repo was remade (localhost-314/HTMLedger):
+  1. Go to dash.cloudflare.com → Workers & Pages → htmlledger
+  2. Settings → Builds & Deployments → Git Repository → Disconnect
+  3. Reconnect to localhost-314/HTMLedger
+  Build settings to re-enter if asked:
+    Root directory:    Website
+    Build command:     npm run build
+    Output directory:  dist
+  4. Check Settings → Environment Variables → Production still has:
+       RESEND_API_KEY  =  (your Resend key)
+  If missing, re-add it from your Resend dashboard → https://resend.com
+
+DONE — everything else (Cloudflare secrets, GitHub repo settings) lives in
+the cloud and does not need to be migrated.
+
+================================================================================
