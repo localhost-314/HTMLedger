@@ -28,5 +28,11 @@
     "vite": "^7.3.1",
     "vite-plugin-pretty-css-modules": "^1.1.0",
     "wrangler": "^3.114.4"
+  },
+  "allowScripts": {
+    "esbuild@0.27.3": true,
+    "esbuild@0.17.19": true,
+    "sharp@0.33.5": true,
+    "workerd@1.20250718.0": true
   }
 }

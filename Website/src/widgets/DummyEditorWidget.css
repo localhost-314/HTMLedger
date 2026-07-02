@@ -1,0 +1,164 @@
+.dew-wrap {
+  background: #0d0d1a;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 13px;
+  height: 390px;
+}
+
+/* ── Topbar / tab row ── */
+.dew-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #13131f;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 0 0.5rem;
+  flex-shrink: 0;
+  height: 38px;
+}
+
+.dew-tabs { display: flex; height: 100%; }
+
+.dew-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 1rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #4a4a6a;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  cursor: default;
+  white-space: nowrap;
+}
+.dew-tab.active {
+  color: #c8c8e8;
+  background: #0d0d1a;
+  border-bottom: 2px solid #4f6ef7;
+  margin-bottom: -1px;
+}
+
+.dew-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.dew-dot-html { background: #f87171; }
+.dew-dot-css  { background: #a5b4fc; }
+
+.dew-lite-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #818cf8;
+  background: rgba(129,140,248,0.12);
+  border: 1px solid rgba(129,140,248,0.3);
+  border-radius: 5px;
+  padding: 0.15rem 0.5rem;
+}
+
+/* ── Code body ── */
+.dew-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.dew-pre {
+  margin: 0;
+  padding: 0.65rem 0;
+  overflow: auto;
+  height: 100%;
+  cursor: text;
+  background: transparent;
+}
+
+.dew-line {
+  display: flex;
+  align-items: baseline;
+  min-height: 1.55em;
+  padding: 0 0.75rem 0 0;
+}
+.dew-line:hover { background: rgba(255,255,255,0.025); }
+
+.dew-ln {
+  min-width: 36px;
+  text-align: right;
+  padding-right: 1rem;
+  color: #2e2e4a;
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 0.72rem;
+  line-height: 1.55em;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.dew-code {
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 0.78rem;
+  line-height: 1.55em;
+  color: #c8c8e8;
+  white-space: pre;
+}
+
+/* Blinking cursor */
+.dew-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #4f6ef7;
+  vertical-align: text-bottom;
+  animation: cursorBlink 1.1s step-end infinite;
+}
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Editable textarea */
+.dew-textarea {
+  width: 100%;
+  height: 100%;
+  background: #0d0d1a;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 0.65rem 0.75rem;
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 0.78rem;
+  line-height: 1.55em;
+  color: #e8e8f8;
+  caret-color: #4f6ef7;
+}
+
+/* ── Footer ── */
+.dew-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.75rem;
+  background: #13131f;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+  height: 30px;
+}
+
+.dew-hint {
+  font-size: 0.7rem;
+  color: #4a4a6a;
+}
+
+.dew-reset {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #4f6ef7;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+.dew-reset:hover { color: #6b85ff; }

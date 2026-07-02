@@ -40,9 +40,10 @@ export default function Privacy() {
 
       <h2>4. Email Delivery</h2>
       <p>
-        Contact form submissions are processed through Mailgun (mailgun.com), a third-party email delivery
-        service. Your message is transmitted to Mailgun's servers solely for the purpose of delivering it
-        to our inbox. Mailgun's privacy policy is available at mailgun.com/privacy.
+        Contact form submissions are processed through Resend (resend.com), a third-party email delivery
+        service. Your message is transmitted to Resend's servers solely for the purpose of delivering it
+        to our inbox. Resend's privacy policy is available at{' '}
+        <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">resend.com/legal/privacy-policy</a>.
       </p>
 
       <h2>5. Website Hosting</h2>

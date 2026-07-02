@@ -1,0 +1,56 @@
+{
+  "name": "htmledger-lite",
+  "version": "1.0.0",
+  "author": "localhost:314 | localhost314.com",
+  "description": "Ultra-lightweight HTML file viewer and editor",
+  "main": "main.js",
+  "scripts": {
+    "build:cm": "esbuild renderer/cm-entry.js --bundle --minify --outfile=renderer/cm-bundle.js --format=iife",
+    "start": "npm run build:cm && electron .",
+    "build": "npm run build:cm && electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.htmledger.lite",
+    "productName": "HTMLedger Lite",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "localhost-314",
+      "repo": "HTMLedger",
+      "releaseType": "release"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/@codemirror",
+      "!node_modules/@lezer",
+      "!node_modules/codemirror",
+      "!node_modules/style-mod",
+      "!node_modules/crelt",
+      "!node_modules/w3c-keyname",
+      "!node_modules/.cache"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3",
+    "esbuild": "^0.28.1"
+  },
+  "dependencies": {
+    "@codemirror/lang-css": "^6.3.1",
+    "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "codemirror": "^6.0.1"
+  },
+  "allowScripts": {
+    "electron@31.7.7": true,
+    "esbuild@0.28.1": true
+  }
+}

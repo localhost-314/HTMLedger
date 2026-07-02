@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HTMLedger Lite</title>
+<link rel="stylesheet" href="editor.css">
+</head>
+<body>
+
+  <div class="titlebar">
+    <div class="titlebar-drag">
+      <img class="titlebar-logo" src="../Logos/Adaptable Graphic Ledger Lite.png" alt="">
+      <span class="titlebar-title" id="tb-ws-name">HTMLedger Lite</span>
+    </div>
+    <div class="titlebar-btns">
+      <button id="tb-min" title="Minimize">&#x2212;</button>
+      <button id="tb-max" title="Maximize">&#x25A1;</button>
+      <button id="tb-close" title="Close">&#x2715;</button>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="sidebar">
+      <div class="sidebar-hd">
+        <button class="icon-btn" id="btn-home" title="Back to workspaces">&#x2190;</button>
+        <span class="sidebar-hd-title" id="sidebar-ws-name">Workspace</span>
+        <button class="icon-btn" id="btn-new-file" title="New file">&#x2795;</button>
+      </div>
+      <div class="sidebar-tree" id="sidebar-tree"></div>
+      <div class="sidebar-ft">
+        <span class="sidebar-last-updated" id="sidebar-last-updated"></span>
+        <button class="icon-btn" id="btn-settings" title="Settings">&#x2699;</button>
+      </div>
+    </div>
+
+    <div class="editor-col">
+      <div class="editor-toolbar">
+        <span class="current-file" id="current-file">No file open</span>
+        <span class="dirty-dot" id="dirty-dot" style="display:none">&#9679;</span>
+        <div class="toolbar-spacer"></div>
+        <button class="tool-btn" id="btn-preview-toggle" title="Toggle preview">Preview</button>
+        <button class="tool-btn" id="btn-save" title="Save (Ctrl+S)">Save</button>
+      </div>
+      <div class="editor-panes">
+        <div class="cm-host" id="cm-host">
+          <div class="empty-editor" id="empty-editor">
+            <div class="empty-editor-inner">
+              <svg class="empty-arrow" viewBox="0 0 64 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 52 58 Q 52 16 16 16" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M 24 7 L 14 16 L 24 25" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p class="empty-editor-text">Navigate your files using the sidebar</p>
+            </div>
+          </div>
+        </div>
+        <div class="preview-pane" id="preview-pane">
+          <iframe id="preview-frame" sandbox="allow-scripts"></iframe>
+          <div class="preview-unavailable" id="preview-unavailable" style="display:none">Preview is only available for HTML files.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New File modal -->
+  <div class="modal-overlay" id="nf-modal" style="display:none">
+    <div class="modal nf-modal-box">
+      <div class="modal-header">
+        <span class="modal-title">New File</span>
+        <button type="button" class="modal-close" id="btn-nf-close">&#x2715;</button>
+      </div>
+      <div class="modal-body nf-modal-body">
+
+        <div class="nf-label">Destination</div>
+        <div class="nf-dest-row">
+          <div class="nf-dest-path" id="nf-dest-path"></div>
+          <button type="button" class="nf-browse-btn" id="btn-nf-browse">Browse</button>
+        </div>
+        <div class="nf-outside-warn" id="nf-outside-warn" style="display:none">
+          <span class="nf-warn-title">&#x26A0; This folder is outside your workspace.</span>
+          <div class="nf-warn-actions">
+            <button type="button" class="nf-warn-btn" id="btn-nf-add-ws">+ Add to workspace</button>
+            <button type="button" class="nf-warn-btn" id="btn-nf-just-file">Just add this file</button>
+            <button type="button" class="nf-warn-back" id="btn-nf-change-dest">&#x2190; Change destination</button>
+          </div>
+        </div>
+
+        <div class="nf-label" style="margin-top:16px">File Type</div>
+        <div class="nf-type-grid" id="nf-type-grid"></div>
+
+        <div class="nf-label" style="margin-top:16px">File Name</div>
+        <div class="nf-name-row">
+          <input type="text" class="nf-name-input" id="nf-name-input" spellcheck="false" autocomplete="off" placeholder="untitled">
+          <span class="nf-ext" id="nf-ext">.html</span>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-cancel-btn" id="btn-nf-cancel">Cancel</button>
+        <button type="button" class="primary-btn" id="btn-nf-create" disabled>Create File</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unsaved changes modal -->
+  <div class="modal-overlay" id="unsaved-modal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Unsaved Changes</span>
+      </div>
+      <div class="modal-body">
+        <p class="unsaved-msg" id="unsaved-msg">You have unsaved changes. Save before leaving?</p>
+        <label class="dont-ask-row">
+          <input type="checkbox" id="dont-ask-cb"> Don't ask me again
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-cancel-btn" id="btn-unsaved-no">No</button>
+        <button class="primary-btn" id="btn-unsaved-yes">Yes, Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="modal-overlay" id="settings-modal" style="display:none">
+    <div class="modal settings-modal-wide">
+      <div class="modal-header">
+        <span class="modal-title">Settings</span>
+        <button class="modal-close" id="btn-settings-close">&#x2715;</button>
+      </div>
+      <div class="modal-body settings-body">
+
+        <div class="settings-section-label">Appearance</div>
+        <div class="settings-row">
+          <div class="settings-row-label">Theme</div>
+          <div class="seg-chips">
+            <button class="seg-chip" id="chip-dark">Dark</button>
+            <button class="seg-chip" id="chip-light">Light</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-label">Editor font size</div>
+          <input class="field-input settings-num" id="font-size-input" type="number" min="10" max="28" step="1">
+        </div>
+        <div class="settings-divider"></div>
+
+        <div class="settings-section-label">Saving</div>
+        <div class="settings-row">
+          <div class="settings-row-label">Unsaved changes</div>
+          <div class="seg-chips">
+            <button class="seg-chip" id="chip-save-ask">Ask</button>
+            <button class="seg-chip" id="chip-save-always">Always Save</button>
+            <button class="seg-chip" id="chip-save-discard">Always Discard</button>
+          </div>
+        </div>
+        <div class="settings-divider"></div>
+
+        <div class="settings-section-label">Startup</div>
+        <div class="settings-row">
+          <div class="settings-row-label">Restore on launch</div>
+          <div class="seg-chips">
+            <button class="seg-chip" id="chip-restore-none">None</button>
+            <button class="seg-chip" id="chip-restore-last">Last Opened</button>
+            <button class="seg-chip" id="chip-restore-specific">Specific</button>
+          </div>
+        </div>
+        <div class="settings-row" id="restore-specific-row" style="display:none">
+          <div class="settings-row-label">Workspace</div>
+          <select class="field-input settings-select" id="restore-ws-select"></select>
+        </div>
+        <div class="settings-divider"></div>
+
+        <div class="settings-footer">
+          <img class="settings-logo" src="../Logos/Adaptable Wordmark Ledger Lite.png" alt="HTMLedger Lite">
+          <div class="settings-links">
+            <a id="link-website">Website</a>
+            <a id="link-source">Source Code</a>
+            <a id="link-tos">Terms of Service</a>
+            <a id="link-privacy">Privacy Policy</a>
+          </div>
+          <div class="settings-links">
+            <a id="link-issue">Report an Issue</a>
+            <a id="link-known">Known Issues</a>
+            <a id="link-contact">Contact Us</a>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="modal-cancel-btn" id="btn-settings-cancel">Cancel</button>
+        <button class="primary-btn" id="btn-settings-save">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="cm-bundle.js"></script>
+  <script src="editor.js"></script>
+</body>
+</html>
