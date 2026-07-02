@@ -1,6 +1,6 @@
 {
   "name": "htmledger",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "localhost:314 | localhost314.com",
   "description": "HTML file viewer, creator, and editor",
   "main": "main.js",
@@ -38,5 +38,8 @@
     "electron-updater": "^6.8.9",
     "emmet": "^2.4.11",
     "monaco-editor": "^0.55.1"
+  },
+  "allowScripts": {
+    "electron@31.7.7": true
   }
 }
