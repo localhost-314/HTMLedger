@@ -2,11 +2,19 @@
 let currentFolder = null;
 let allFiles = [];
 let filteredFiles = [];
-let viewMode = 'grid';
+let viewMode = localStorage.getItem('htmledger-view') || 'grid';
 let sortBy = 'name-asc';
 let contextTarget = null;
-let recentFolders = [];
-let recentFiles   = [];
+let recentFolders    = [];
+let recentFiles      = [];
+let workspaceRoot    = null;
+let folderStack      = [];
+
+// Workspace system
+let workspaces      = [];        // array of workspace objects
+let activeWorkspace = null;      // workspace currently browsed/open
+let wsModalFolders  = [];        // folders in the New/Edit modal
+let wsModalEditId   = null;      // non-null when editing an existing workspace
 
 /* ── DOM refs ── */
 const grid          = document.getElementById('file-grid');
@@ -30,8 +38,13 @@ async function init() {
     window.api.getRecentFolders().catch(() => []),
     window.api.getRecentFiles().catch(() => []),
   ]);
+  await loadWorkspaces();
   renderHomeLanding();
   bindEvents();
+  initWorkspaces();
+  applyRestoreOnLaunch();
+  document.getElementById('view-grid').classList.toggle('active', viewMode === 'grid');
+  document.getElementById('view-list').classList.toggle('active', viewMode === 'list');
 }
 
 /* ── Events ── */
@@ -61,6 +74,8 @@ function bindEvents() {
   btnNewFile.onclick = newFile;
   document.getElementById('empty-new-file').onclick = newFile;
 
+  _initNfModal();
+
   // View toggle
   document.getElementById('view-grid').onclick = () => setView('grid');
   document.getElementById('view-list').onclick = () => setView('list');
@@ -87,8 +102,9 @@ function bindEvents() {
     const files = [...e.dataTransfer.files].filter(f => /\.(html|htm|xml|css|js)$/i.test(f.name));
     if (files.length === 0) return;
     sessionStorage.setItem('edit-file', files[0].path);
+    sessionStorage.removeItem('active-workspace');
+    sessionStorage.removeItem('workspace-folder');
     if (files.length > 1) {
-      // Store extra files for editor to pick up
       sessionStorage.setItem('extra-files', JSON.stringify(files.slice(1).map(f => f.path)));
     }
     window.location.href = 'editor.html';
@@ -98,6 +114,8 @@ function bindEvents() {
 /* ── Home screen ── */
 function goHome() {
   currentFolder = null;
+  workspaceRoot = null;
+  folderStack   = [];
   renderHomeLanding();
   setActiveNav('nav-home');
 }
@@ -111,7 +129,6 @@ function renderHomeLanding() {
   btnNewFile.style.display    = 'none';
   sidebarWs.style.display     = 'none';
   fileCount.textContent       = '';
-
   // Breadcrumb: just "Home" (not clickable)
   bcHome.textContent = 'Home';
   bcHome.classList.remove('clickable');
@@ -123,26 +140,23 @@ function renderHomeLanding() {
   sidebarWs.style.display  = 'none';
   fileCount.textContent    = '';
 
-  // Recent workspaces
+  const isGrid = viewMode === 'grid';
+
+  // Deduplicate recent folders
+  const sep = (p) => p.replace(/\\/g, '/').toLowerCase() + '/';
+  const deduped = recentFolders.filter(f =>
+    !recentFolders.some(other => other !== f && sep(f).startsWith(sep(other)))
+  );
+
+  // Workspace cards
   const recentSection = document.getElementById('recent-section');
   const recentList    = document.getElementById('recent-list');
-
-  if (recentFolders.length > 0) {
+  if (workspaces.length > 0) {
     recentSection.style.display = 'block';
     recentList.innerHTML = '';
-    recentFolders.slice(0, 6).forEach(folder => {
-      const item = document.createElement('div');
-      item.className = 'recent-item';
-      const name = folder.replace(/\\/g, '/').split('/').pop();
-      item.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
-        </svg>
-        <span class="recent-item-name">${name}</span>
-        <span class="recent-item-path">${folder}</span>`;
-      item.addEventListener('click', () => loadFolder(folder));
-      recentList.appendChild(item);
-    });
+    recentList.className = 'ws-card-list';
+    workspaces.slice().sort((a, b) => (b.lastOpened || '') > (a.lastOpened || '') ? 1 : -1)
+      .forEach(ws => recentList.appendChild(makeWsCard(ws)));
   } else {
     recentSection.style.display = 'none';
   }
@@ -150,23 +164,36 @@ function renderHomeLanding() {
   // Recent files
   const recentFilesSection = document.getElementById('recent-files-section');
   const recentFilesList    = document.getElementById('recent-files-list');
-
   if (recentFiles.length > 0) {
     recentFilesSection.style.display = 'block';
     recentFilesList.innerHTML = '';
-    recentFiles.slice(0, 8).forEach(f => {
-      const item = document.createElement('div');
-      item.className = 'recent-item';
-      const ext = f.name.split('.').pop().toLowerCase();
-      const extColors = { html:'#f97316', htm:'#f97316', css:'#60a5fa', js:'#fbbf24', xml:'#34d399' };
+    recentFilesList.className = isGrid ? 'recent-grid' : 'recent-list-view';
+    const extColors = { html:'#f97316', htm:'#f97316', css:'#60a5fa', js:'#fbbf24', xml:'#34d399' };
+    recentFiles.slice(0, isGrid ? 6 : 8).forEach(f => {
+      const ext   = f.name.split('.').pop().toLowerCase();
       const color = extColors[ext] || '#8888b0';
-      item.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
-          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-          <polyline points="14,2 14,8 20,8"/>
-        </svg>
-        <span class="recent-item-name">${f.name}</span>
-        <span class="recent-item-path">${f.path}</span>`;
+      const item  = document.createElement('div');
+      if (isGrid) {
+        const EXT = ext.toUpperCase();
+        item.className = 'file-card';
+        item.innerHTML = `
+          <div class="card-preview">
+            <div class="card-preview-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+            </div>
+            <span class="card-badge">${EXT}</span>
+          </div>
+          <div class="card-info">
+            <div class="card-name" title="${f.path}">${f.name}</div>
+            <div class="card-meta"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.path}</span></div>
+          </div>`;
+      } else {
+        item.className = 'recent-item';
+        item.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+          <span class="recent-item-name">${f.name}</span>
+          <span class="recent-item-path">${f.path}</span>`;
+      }
       item.addEventListener('click', () => openCard(f.path));
       recentFilesList.appendChild(item);
     });
@@ -175,22 +202,22 @@ function renderHomeLanding() {
   }
 }
 
-/* ── Open folder as workspace ── */
+/* ── Open folder as workspace — now opens the New Workspace modal ── */
 async function openFolder() {
-  const folder = await window.api.openFolderDialog();
-  if (!folder) return;
-  await loadFolder(folder);
+  openWsModal();
 }
 
 async function loadFolder(folderPath) {
   const result = await window.api.listHtmlFiles(folderPath);
   if (!result.success) { showToast('Error reading folder'); return; }
 
+  workspaceRoot = folderPath;
+  folderStack   = [];
   currentFolder = folderPath;
   allFiles      = result.files;
   filteredFiles = [...allFiles];
 
-  // Update recents
+  // Update recents (only for top-level opens)
   recentFolders = [folderPath, ...recentFolders.filter(f => f !== folderPath)].slice(0, 10);
   await window.api.saveRecentFolders(recentFolders);
 
@@ -198,28 +225,59 @@ async function loadFolder(folderPath) {
   setActiveNav('nav-workspace-files');
 }
 
+async function drillIntoFolder(folderPath) {
+  const result = await window.api.listHtmlFiles(folderPath);
+  if (!result.success) { showToast('Error reading folder'); return; }
+
+  folderStack.push(currentFolder);
+  currentFolder = folderPath;
+  allFiles      = result.files;
+  filteredFiles = [...allFiles];
+
+  renderWorkspace();
+}
+
+async function drillUp() {
+  if (folderStack.length === 0) return;
+  const parent = folderStack.pop();
+  const result = await window.api.listHtmlFiles(parent);
+  if (!result.success) { showToast('Error reading folder'); return; }
+
+  currentFolder = parent;
+  allFiles      = result.files;
+  filteredFiles = [...allFiles];
+
+  renderWorkspace();
+}
+
 /* ── Render workspace file view ── */
 function renderWorkspace() {
   if (!currentFolder) return;
 
-  const folderName = currentFolder.replace(/\\/g, '/').split('/').pop();
+  const rootName    = (workspaceRoot || currentFolder).replace(/\\/g, '/').split('/').pop();
+  const folderName  = currentFolder.replace(/\\/g, '/').split('/').pop();
+  const isSubfolder = folderStack.length > 0;
 
-  // Breadcrumb: Home (clickable) › FolderName
+  // Breadcrumb
   bcHome.textContent = 'Home';
   bcHome.classList.add('clickable');
-  bcSep.style.display  = 'inline';
-  bcFolder.textContent = folderName;
+  bcSep.style.display = 'inline';
 
-  // Show workspace sidebar info
-  sidebarWs.style.display = 'block';
-  workspaceName.textContent = folderName;
+  if (isSubfolder) {
+    bcFolder.innerHTML = `<span class="bc-back" id="bc-back-btn">← ${rootName}</span> › ${folderName}`;
+    document.getElementById('bc-back-btn').addEventListener('click', (e) => { e.stopPropagation(); drillUp(); });
+  } else {
+    bcFolder.textContent = folderName;
+  }
 
-  // Show search, sort & new file button
+  // Sidebar
+  sidebarWs.style.display  = 'block';
+  workspaceName.textContent = rootName;
+
   searchWrap.style.display = 'flex';
   sortSelect.style.display = 'block';
   btnNewFile.style.display = 'flex';
 
-  // Hide landing
   homeLanding.style.display = 'none';
 
   filteredFiles = [...allFiles];
@@ -229,9 +287,12 @@ function renderWorkspace() {
 
 /* ── Render file cards ── */
 function renderFiles() {
-  fileCount.textContent = filteredFiles.length === 1
-    ? '1 file'
-    : filteredFiles.length > 0 ? `${filteredFiles.length} files` : '';
+  const fileOnlyCount = filteredFiles.filter(f => f.type !== 'folder').length;
+  const folderCount   = filteredFiles.filter(f => f.type === 'folder').length;
+  const parts = [];
+  if (fileOnlyCount > 0) parts.push(fileOnlyCount === 1 ? '1 file' : `${fileOnlyCount} files`);
+  if (folderCount > 0)   parts.push(folderCount === 1 ? '1 folder' : `${folderCount} folders`);
+  fileCount.textContent = parts.join(', ');
 
   if (filteredFiles.length === 0) {
     grid.style.display       = 'none';
@@ -239,11 +300,12 @@ function renderFiles() {
     return;
   }
 
-  emptyState.style.display = 'none';
-  grid.style.display       = 'grid';
-  grid.innerHTML           = '';
-  grid.className           = 'file-grid' + (viewMode === 'list' ? ' list-view' : '');
-
+  emptyState.style.display              = 'none';
+  grid.style.display                    = 'grid';
+  grid.className                        = 'file-grid' + (viewMode === 'list' ? ' list-view' : '');
+  grid.style.gridTemplateColumns        = viewMode === 'list' ? '1fr' : 'repeat(auto-fill, minmax(180px, 1fr))';
+  grid.style.gap                        = viewMode === 'list' ? '6px' : '16px';
+  grid.innerHTML                        = '';
   filteredFiles.forEach(f => grid.appendChild(makeCard(f)));
 }
 
@@ -256,8 +318,43 @@ function badgeClass(ext) {
 
 function makeCard(file) {
   const div  = document.createElement('div');
-  div.className   = 'file-card';
   div.dataset.path = file.path;
+
+  if (file.type === 'folder') {
+    div.className = 'file-card folder-card';
+    if (viewMode === 'grid') {
+      div.innerHTML = `
+        <div class="card-preview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        </div>
+        <div class="card-info">
+          <div class="card-name" title="${file.name}">${file.name}</div>
+          <div class="card-meta"><span>Folder</span></div>
+        </div>`;
+    } else {
+      div.innerHTML = `
+        <div class="card-preview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        </div>
+        <div class="card-info">
+          <div class="list-name-wrap">
+            <span class="card-name" title="${file.name}">${file.name}</span>
+            <span class="card-badge" style="background:rgba(79,110,247,.2);border-color:rgba(79,110,247,.4);color:#8ba0ff">DIR</span>
+          </div>
+          <div class="card-meta"><span>Folder</span></div>
+        </div>`;
+    }
+    div.addEventListener('click', () => {
+      if (localStorage.getItem('htmledger-folders-as-workspace') === 'true') {
+        loadFolder(file.path);
+      } else {
+        drillIntoFolder(file.path);
+      }
+    });
+    return div;
+  }
+
+  div.className = 'file-card';
 
   const ext  = file.name.split('.').pop().toUpperCase();
   const bc   = badgeClass(ext);
@@ -322,40 +419,115 @@ async function openSingleFile() {
   const filePath = await window.api.openFileDialog();
   if (!filePath) return;
   sessionStorage.setItem('edit-file', filePath);
+  sessionStorage.removeItem('active-workspace');
+  sessionStorage.removeItem('workspace-folder');
   window.location.href = 'editor.html';
 }
 
 /* ── Open file in editor ── */
 function openCard(filePath) {
   sessionStorage.setItem('edit-file', filePath);
-  if (currentFolder) sessionStorage.setItem('workspace-folder', currentFolder);
+  if (activeWorkspace) {
+    sessionStorage.setItem('active-workspace', JSON.stringify(activeWorkspace));
+    sessionStorage.removeItem('workspace-folder');
+  } else if (currentFolder) {
+    sessionStorage.setItem('workspace-folder', currentFolder);
+    sessionStorage.removeItem('active-workspace');
+  } else {
+    sessionStorage.removeItem('active-workspace');
+    sessionStorage.removeItem('workspace-folder');
+  }
   window.location.href = 'editor.html';
 }
 
-/* ── New file ── */
-async function newFile() {
-  let savePath = await window.api.saveFileDialog(
-    currentFolder ? currentFolder + '\\untitled.html' : 'untitled.html'
-  );
-  if (!savePath) return;
-  if (!/\.(html|htm|xml|css|js)$/i.test(savePath)) savePath += '.html';
+/* ── New File modal ── */
+const NF_TYPES = [
+  { ext: 'html', label: 'HTML' }, { ext: 'css',  label: 'CSS'  },
+  { ext: 'js',   label: 'JS'   }, { ext: 'jsx',  label: 'JSX'  },
+  { ext: 'ts',   label: 'TS'   }, { ext: 'tsx',  label: 'TSX'  },
+  { ext: 'json', label: 'JSON' }, { ext: 'xml',  label: 'XML'  },
+  { ext: 'svg',  label: 'SVG'  }, { ext: 'md',   label: 'MD'   },
+  { ext: 'txt',  label: 'TXT'  },
+];
+const NF_STARTERS = {
+  html: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>New Page</title>\n</head>\n<body>\n\n</body>\n</html>',
+  css:  '/* Styles */\n', js: '// Script\n', jsx: '// Component\n',
+  ts:   '// TypeScript\n', tsx: '// TSX Component\n',
+  json: '{\n  \n}\n',
+  xml:  '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n\n</root>',
+  svg:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\n\n</svg>',
+  md: '# Title\n\n', txt: '',
+};
 
-  const starter = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Page</title>
-</head>
-<body>
+let _nfDest    = '';
+let _nfExt     = 'html';
+let _nfOutside = null; // null | 'just-file'
 
-</body>
-</html>`;
+function _nfInsideFolder(p) {
+  if (!currentFolder) return true; // no folder browsed, no restriction
+  const base = currentFolder.replace(/\\/g, '/').toLowerCase();
+  return p.replace(/\\/g, '/').toLowerCase().startsWith(base);
+}
+function _nfSetDest(p) {
+  _nfDest    = p;
+  _nfOutside = null;
+  const el = document.getElementById('nf-dest-path');
+  el.textContent = p || 'Choose a folder…';
+  el.classList.toggle('set', !!p);
+  document.getElementById('nf-outside-warn').style.display = (p && currentFolder && !_nfInsideFolder(p)) ? '' : 'none';
+  document.getElementById('btn-nf-create').disabled = !p;
+}
 
-  const result = await window.api.writeFile(savePath, starter);
-  if (!result.success) { showToast('Could not create file'); return; }
-  sessionStorage.setItem('edit-file', savePath);
+function newFile() {
+  _nfDest    = currentFolder || '';
+  _nfExt     = 'html';
+  _nfOutside = null;
+  const grid = document.getElementById('nf-type-grid');
+  grid.innerHTML = NF_TYPES.map(t =>
+    `<button type="button" class="nf-type-chip${t.ext === 'html' ? ' active' : ''}" data-ext="${t.ext}">${t.label}</button>`
+  ).join('');
+  grid.querySelectorAll('.nf-type-chip').forEach(b => b.onclick = () => {
+    _nfExt = b.dataset.ext;
+    grid.querySelectorAll('.nf-type-chip').forEach(x => x.classList.toggle('active', x === b));
+    document.getElementById('nf-ext').textContent = '.' + _nfExt;
+  });
+  const destEl = document.getElementById('nf-dest-path');
+  destEl.textContent = _nfDest || 'Choose a folder…';
+  destEl.classList.toggle('set', !!_nfDest);
+  document.getElementById('nf-outside-warn').style.display = 'none';
+  document.getElementById('nf-ext').textContent = '.html';
+  document.getElementById('nf-name-input').value = '';
+  document.getElementById('btn-nf-create').disabled = !_nfDest;
+  document.getElementById('nf-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('nf-name-input').focus(), 80);
+}
+function _closeNfModal() { document.getElementById('nf-modal').style.display = 'none'; }
+async function _commitNfCreate() {
+  if (!_nfDest) return;
+  const raw  = document.getElementById('nf-name-input').value.trim() || 'untitled';
+  const name = raw.endsWith('.' + _nfExt) ? raw : raw + '.' + _nfExt;
+  const filePath = _nfDest + '\\' + name;
+  const exists = await window.api.readFile(filePath);
+  if (exists.success) { showToast('"' + name + '" already exists'); document.getElementById('nf-name-input').select(); return; }
+  const starter = NF_STARTERS[_nfExt] ?? '';
+  const r = await window.api.writeFile(filePath, starter);
+  if (!r.success) { showToast('Could not create file'); return; }
+  _closeNfModal();
+  sessionStorage.setItem('edit-file', filePath);
   window.location.href = 'editor.html';
+}
+
+function _initNfModal() {
+  document.getElementById('btn-nf-close').onclick      = _closeNfModal;
+  document.getElementById('btn-nf-cancel').onclick     = _closeNfModal;
+  document.getElementById('btn-nf-create').onclick     = _commitNfCreate;
+  document.getElementById('btn-nf-browse').onclick     = async () => { const f = await window.api.openFolderDialog(); if (f) _nfSetDest(f); };
+  document.getElementById('btn-nf-just-file').onclick  = () => { _nfOutside = 'just-file'; document.getElementById('nf-outside-warn').style.display = 'none'; document.getElementById('btn-nf-create').disabled = false; };
+  document.getElementById('btn-nf-change-dest').onclick = () => _nfSetDest(currentFolder || '');
+  document.getElementById('nf-name-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.preventDefault(); _commitNfCreate(); }
+    if (e.key === 'Escape') _closeNfModal();
+  });
 }
 
 /* ── Delete ── */
@@ -373,7 +545,9 @@ async function deleteFile(filePath) {
 /* ── Search ── */
 function onSearch() {
   const q = searchInput.value.toLowerCase();
-  filteredFiles = q ? allFiles.filter(f => f.name.toLowerCase().includes(q)) : [...allFiles];
+  filteredFiles = q
+    ? allFiles.filter(f => f.type === 'folder' || f.name.toLowerCase().includes(q))
+    : [...allFiles];
   applySortAndRender();
 }
 
@@ -401,9 +575,11 @@ function applySortAndRender() {
 /* ── View mode ── */
 function setView(mode) {
   viewMode = mode;
+  localStorage.setItem('htmledger-view', mode);
   document.getElementById('view-grid').classList.toggle('active', mode === 'grid');
   document.getElementById('view-list').classList.toggle('active', mode === 'list');
   if (currentFolder) renderFiles();
+  else renderHomeLanding();
 }
 
 /* ── Rename ── */
@@ -467,6 +643,371 @@ function showToast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+/* ── Workspace system ── */
+async function loadWorkspaces() {
+  const result = await window.api.getWorkspaces().catch(() => ({ exists: false, data: [] }));
+  workspaces = result.data || [];
+
+  // Migration: if no workspaces.json yet but recent folders exist, prompt user
+  if (!result.exists && recentFolders.length > 0) {
+    await showMigrationPrompt();
+  }
+}
+
+async function saveWorkspaces() {
+  await window.api.saveWorkspaces(workspaces);
+}
+
+function showMigrationPrompt() {
+  return new Promise(resolve => {
+    document.getElementById('migration-modal').style.display = 'flex';
+    document.getElementById('btn-migrate-convert').onclick = async () => {
+      workspaces = recentFolders.map(f => makeWorkspace(f.replace(/\\/g, '/').split('/').pop(), [f]));
+      await saveWorkspaces();
+      document.getElementById('migration-modal').style.display = 'none';
+      resolve();
+    };
+    document.getElementById('btn-migrate-fresh').onclick = async () => {
+      workspaces = [];
+      recentFolders = [];
+      await Promise.all([saveWorkspaces(), window.api.saveRecentFolders([])]);
+      document.getElementById('migration-modal').style.display = 'none';
+      resolve();
+    };
+  });
+}
+
+function makeWorkspace(name, folders, opts = {}) {
+  return {
+    id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
+    name,
+    folders,
+    deploy: opts.deploy || '',
+    theme:  opts.theme  || '',
+    createdAt:   new Date().toISOString(),
+    lastOpened:  null,
+  };
+}
+
+function makeWsCard(ws) {
+  const card = document.createElement('div');
+  card.className = 'ws-card';
+
+  const folderCount = ws.folders.length;
+  const folderLabel = folderCount === 1
+    ? ws.folders[0].replace(/\\/g, '/').split('/').slice(-2).join('/')
+    : `${folderCount} folders`;
+
+  card.innerHTML = `
+    <div class="ws-card-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+    </div>
+    <div class="ws-card-body">
+      <div class="ws-card-name">${ws.name}</div>
+      <div class="ws-card-meta">${folderLabel}</div>
+      ${ws.lastOpened ? `<div class="ws-card-opened">Last opened ${relTime(ws.lastOpened)}</div>` : ''}
+    </div>
+    <div class="ws-card-actions">
+      <button class="ws-card-btn" title="Workspace Settings" data-action="edit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+      <button class="ws-card-btn ws-card-btn-del" title="Remove Workspace" data-action="delete">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+      </button>
+    </div>`;
+
+  card.querySelector('[data-action="edit"]').addEventListener('click', e => { e.stopPropagation(); openWsModal(ws); });
+  card.querySelector('[data-action="delete"]').addEventListener('click', e => { e.stopPropagation(); deleteWorkspace(ws.id); });
+  card.addEventListener('click', () => openWorkspace(ws));
+  return card;
+}
+
+function relTime(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 2)  return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
+function openWorkspace(ws) {
+  ws.lastOpened = new Date().toISOString();
+  saveWorkspaces();
+  activeWorkspace = ws;
+  sessionStorage.setItem('active-workspace', JSON.stringify(ws));
+  sessionStorage.removeItem('workspace-folder');
+  if (ws.defaultFile) {
+    sessionStorage.setItem('edit-file', ws.defaultFile);
+  } else {
+    sessionStorage.removeItem('edit-file');
+  }
+  window.location.href = 'editor.html';
+}
+
+async function deleteWorkspace(id) {
+  const ws = workspaces.find(w => w.id === id);
+  if (!ws) return;
+  if (!confirm(`Remove workspace "${ws.name}"? The files won't be deleted.`)) return;
+  workspaces = workspaces.filter(w => w.id !== id);
+  await saveWorkspaces();
+  renderHomeLanding();
+}
+
+/* ── New / Edit Workspace modal ── */
+function openWsModal(editWs = null) {
+  wsModalEditId  = editWs ? editWs.id : null;
+  wsModalFolders = editWs ? [...editWs.folders] : [];
+
+  document.getElementById('ws-modal-title').textContent   = editWs ? 'Workspace Settings' : 'New Workspace';
+  document.getElementById('btn-ws-modal-save').textContent = editWs ? 'Save Changes' : 'Create Workspace';
+  document.getElementById('ws-name-input').value           = editWs ? editWs.name : '';
+  document.getElementById('ws-deploy-input').value         = editWs ? (editWs.deploy || '') : '';
+  document.getElementById('ws-theme-select').value         = editWs ? (editWs.theme || '') : '';
+  document.getElementById('ws-conflict-warning').style.display = 'none';
+
+  renderWsFoldersList();
+  document.getElementById('ws-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('ws-name-input').focus(), 50);
+}
+
+function closeWsModal() {
+  document.getElementById('ws-modal').style.display = 'none';
+  wsModalFolders = [];
+  wsModalEditId  = null;
+}
+
+function renderWsFoldersList() {
+  const list = document.getElementById('ws-folders-list');
+  if (wsModalFolders.length === 0) {
+    list.innerHTML = '<p class="contact-hint" style="margin:4px 0">No folders added yet.</p>';
+    return;
+  }
+  list.innerHTML = '';
+  wsModalFolders.forEach((f, i) => {
+    const row = document.createElement('div');
+    row.className = 'ws-folder-row';
+    row.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;flex-shrink:0;opacity:.6"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      <span class="ws-folder-path">${f}</span>
+      <button class="ws-folder-remove" title="Remove" data-idx="${i}">✕</button>`;
+    row.querySelector('.ws-folder-remove').addEventListener('click', () => {
+      wsModalFolders.splice(i, 1);
+      renderWsFoldersList();
+      checkAndShowConflicts();
+    });
+    list.appendChild(row);
+  });
+}
+
+async function wsAddFolder() {
+  const folder = await window.api.openFolderDialog();
+  if (!folder) return;
+  if (wsModalFolders.some(f => f.toLowerCase() === folder.toLowerCase())) {
+    showToast('That folder is already in this workspace.');
+    return;
+  }
+  // Auto-fill workspace name from first folder
+  const nameInput = document.getElementById('ws-name-input');
+  if (!nameInput.value.trim() && wsModalFolders.length === 0) {
+    nameInput.value = folder.replace(/\\/g, '/').split('/').pop();
+  }
+  wsModalFolders.push(folder);
+  renderWsFoldersList();
+  checkAndShowConflicts();
+}
+
+function checkFolderConflicts(folders) {
+  const msgs = [];
+  for (const ws of workspaces) {
+    if (ws.id === wsModalEditId) continue;
+    for (const nf of folders) {
+      const nl = nf.toLowerCase().replace(/\\/g, '/');
+      for (const ef of ws.folders) {
+        const el = ef.toLowerCase().replace(/\\/g, '/');
+        if (nl === el)
+          msgs.push(`"${nf}" is already in workspace <strong>${ws.name}</strong>.`);
+        else if (nl.startsWith(el + '/'))
+          msgs.push(`"${nf}" is inside a folder already used by workspace <strong>${ws.name}</strong>.`);
+        else if (el.startsWith(nl + '/'))
+          msgs.push(`A folder in workspace <strong>${ws.name}</strong> is inside "${nf}".`);
+      }
+    }
+  }
+  return msgs;
+}
+
+function checkAndShowConflicts() {
+  const warn = document.getElementById('ws-conflict-warning');
+  const msgs = checkFolderConflicts(wsModalFolders);
+  if (msgs.length === 0) { warn.style.display = 'none'; return; }
+  warn.innerHTML = '⚠ ' + msgs.join('<br>') + '<br><span style="opacity:.75">You can still save — this is just a heads-up.</span>';
+  warn.style.display = '';
+}
+
+async function saveWsModal() {
+  const name = document.getElementById('ws-name-input').value.trim();
+  if (!name) { document.getElementById('ws-name-input').focus(); showToast('Please enter a workspace name.'); return; }
+  if (wsModalFolders.length === 0) { showToast('Add at least one folder.'); return; }
+
+  const deploy    = document.getElementById('ws-deploy-input').value.trim();
+  const theme     = document.getElementById('ws-theme-select').value;
+  const isEditing = !!wsModalEditId; // capture before closeWsModal clears it
+
+  if (isEditing) {
+    const ws = workspaces.find(w => w.id === wsModalEditId);
+    if (ws) { ws.name = name; ws.folders = [...wsModalFolders]; ws.deploy = deploy; ws.theme = theme; }
+  } else {
+    workspaces.push(makeWorkspace(name, [...wsModalFolders], { deploy, theme }));
+  }
+
+  await saveWorkspaces();
+  closeWsModal();
+  renderHomeLanding();
+  if (!isEditing) {
+    const newWs = workspaces[workspaces.length - 1];
+    if (confirm(`Workspace "${name}" created! Open it now?`)) openWorkspace(newWs);
+  }
+}
+
+function initWorkspaces() {
+  document.getElementById('btn-ws-modal-close').onclick  = closeWsModal;
+  document.getElementById('btn-ws-modal-cancel').onclick = closeWsModal;
+  document.getElementById('btn-ws-modal-save').onclick   = saveWsModal;
+  document.getElementById('btn-ws-add-folder').onclick   = wsAddFolder;
+  document.getElementById('ws-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeWsModal(); });
+}
+
+/* ── Compatible files modal ── */
+function openCompat() {
+  document.getElementById('compat-modal').style.display = 'flex';
+}
+function closeCompat() {
+  document.getElementById('compat-modal').style.display = 'none';
+}
+function initCompat() {
+  document.getElementById('compat-link').onclick        = e => { e.preventDefault(); openCompat(); };
+  document.getElementById('compat-link-empty').onclick  = e => { e.preventDefault(); openCompat(); };
+  document.getElementById('btn-compat-close').onclick   = closeCompat;
+  document.getElementById('btn-compat-done').onclick    = closeCompat;
+  document.getElementById('compat-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('compat-modal')) closeCompat();
+  });
+}
+
+/* ── Restore workspace on launch ── */
+async function applyRestoreOnLaunch() {
+  try {
+    const s = await window.api.getSettings();
+    if (s.restoreWorkspace === 'last') {
+      const ws = [...workspaces].sort((a, b) =>
+        ((b.lastOpened || '') > (a.lastOpened || '')) ? 1 : -1
+      )[0];
+      if (ws) { setTimeout(() => openWorkspace(ws), 80); }
+    } else if (s.restoreWorkspace === 'specific' && s.restoreWorkspaceId) {
+      const ws = workspaces.find(w => w.id === s.restoreWorkspaceId);
+      if (ws) { setTimeout(() => openWorkspace(ws), 80); }
+    }
+  } catch {}
+}
+
+/* ── Settings — unified panel ── */
+function initSettings() {
+  document.getElementById('btn-settings-home').onclick = () => openUnifiedSettings('app');
+  document.addEventListener('settings-changed', e => {
+    const s = e.detail || {};
+    if (s.theme) applyTheme(s.theme);
+  });
+  document.addEventListener('open-contact-modal', () => openContactModal());
+}
+
+/* ── Contact modal ── */
+const CONTACT_WEB = 'https://htmledger.localhost314.com/contact';
+const CONTACT_EMAIL = 'htmledger@localhost314.com';
+const CONTACT_FALLBACK = `Keep having issues? <a href="#" onclick="window.api.openExternal('${CONTACT_WEB}');return false;" style="color:inherit;text-decoration:underline">Contact Us</a>`;
+
+function openContactModal() {
+  resetContactModal();
+  const modal = document.getElementById('contact-modal');
+  modal.style.display = 'flex';
+  if (!navigator.onLine) showContactOffline();
+}
+
+function showContactOffline() {
+  document.getElementById('contact-body').innerHTML = `
+    <div class="contact-success" style="padding:24px 16px">
+      <div class="contact-success-icon" style="font-size:28px">⚠</div>
+      <h3 style="margin-bottom:8px">You're offline</h3>
+      <p style="margin-bottom:14px">An internet connection is required to send a message.<br>You can also email us directly at <strong>${CONTACT_EMAIL}</strong></p>
+      <button class="btn-primary" id="btn-contact-retry">Refresh</button>
+    </div>`;
+  document.getElementById('btn-contact-send').style.display = 'none';
+  document.getElementById('btn-contact-cancel').textContent = 'Close';
+  document.getElementById('btn-contact-retry').onclick = () => {
+    if (navigator.onLine) { resetContactModal(); document.getElementById('btn-contact-send').style.display = ''; document.getElementById('btn-contact-cancel').textContent = 'Cancel'; }
+    else { document.getElementById('btn-contact-retry').textContent = 'Still offline…'; setTimeout(() => { if(document.getElementById('btn-contact-retry')) document.getElementById('btn-contact-retry').textContent = 'Refresh'; }, 1500); }
+  };
+}
+function closeContactModal() {
+  document.getElementById('contact-modal').style.display = 'none';
+}
+function resetContactModal() {
+  document.getElementById('contact-body').innerHTML = `
+    <div class="contact-fields">
+      <div class="contact-field-row">
+        <input class="contact-input" id="contact-name"  type="text"  placeholder="Your name"      autocomplete="off">
+        <input class="contact-input" id="contact-email" type="email" placeholder="your@email.com" autocomplete="off">
+      </div>
+      <input class="contact-input" id="contact-subject" type="text" placeholder="Subject" autocomplete="off">
+      <textarea class="contact-input contact-textarea" id="contact-message" placeholder="Tell us what's on your mind…" rows="5"></textarea>
+      <p class="contact-hint">Or email us directly at <strong>htmledger@localhost314.com</strong></p>
+      <div id="contact-error" class="contact-error" style="display:none"></div>
+    </div>`;
+  document.getElementById('btn-contact-send').style.display = '';
+  document.getElementById('btn-contact-cancel').textContent = 'Cancel';
+}
+async function sendContactForm() {
+  if (!navigator.onLine) { showContactOffline(); return; }
+  const name    = document.getElementById('contact-name')?.value.trim();
+  const email   = document.getElementById('contact-email')?.value.trim();
+  const subject = document.getElementById('contact-subject')?.value.trim();
+  const message = document.getElementById('contact-message')?.value.trim();
+  const errEl   = document.getElementById('contact-error');
+  const sendBtn = document.getElementById('btn-contact-send');
+  if (!name || !email || !subject || !message) {
+    errEl.textContent = 'Please fill in all fields.'; errEl.style.display = ''; return;
+  }
+  sendBtn.disabled = true; sendBtn.textContent = 'Sending…'; errEl.style.display = 'none';
+  try {
+    const res  = await fetch('https://htmledger.localhost314.com/api/contact', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, subject, message })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.success) {
+      document.getElementById('contact-body').innerHTML = `
+        <div class="contact-success">
+          <div class="contact-success-icon">✓</div>
+          <h3>Message sent!</h3>
+          <p>We'll get back to you at ${email} as soon as we can.</p>
+        </div>`;
+      document.getElementById('btn-contact-send').style.display = 'none';
+      document.getElementById('btn-contact-cancel').textContent = 'Close';
+    } else {
+      errEl.innerHTML = `Error ${res.status} — ${data.error || 'Something went wrong.'} Either try <a href="#" onclick="window.api.openExternal('${CONTACT_WEB}');return false;" style="color:inherit;text-decoration:underline">htmledger.localhost314.com/contact</a> or email <strong>${CONTACT_EMAIL}</strong><br><br>${CONTACT_FALLBACK}`;
+      errEl.style.display = ''; sendBtn.disabled = false; sendBtn.textContent = 'Send Message';
+    }
+  } catch {
+    errEl.innerHTML = `Error — Unable to reach the server. Either try <a href="#" onclick="window.api.openExternal('${CONTACT_WEB}');return false;" style="color:inherit;text-decoration:underline">htmledger.localhost314.com/contact</a> or email <strong>${CONTACT_EMAIL}</strong><br><br>${CONTACT_FALLBACK}`;
+    errEl.style.display = ''; sendBtn.disabled = false; sendBtn.textContent = 'Send Message';
+  }
+}
+document.getElementById('btn-contact-close').onclick  = closeContactModal;
+document.getElementById('btn-contact-cancel').onclick = closeContactModal;
+document.getElementById('btn-contact-send').onclick   = sendContactForm;
+document.getElementById('contact-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeContactModal(); });
+
 /* ── Theme ── */
 function initTheme() {
   const saved = localStorage.getItem('htmledger-theme') || 'dark';
@@ -501,4 +1042,6 @@ function initUpdater() {
 
 init();
 initTheme();
+initCompat();
+initSettings();
 initUpdater();

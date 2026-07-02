@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HTMLedger – Editor</title>
   <link rel="stylesheet" href="editor.css">
+  <link rel="stylesheet" href="settings.css">
 </head>
 <body>
 
@@ -61,6 +62,10 @@
     <button class="tool-btn toggle-btn" id="btn-sidebar" title="Toggle file sidebar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
     </button>
+    <button class="tool-btn toggle-btn" id="btn-terminal" title="Toggle terminal (Ctrl+`)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,17 10,11 4,5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      <span>Terminal</span>
+    </button>
     <button class="tool-btn toggle-btn" id="btn-minimap" title="Toggle minimap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="14" y="3" width="7" height="18" rx="1"/><line x1="3" y1="7" x2="10" y2="7"/><line x1="3" y1="11" x2="10" y2="11"/><line x1="3" y1="15" x2="8" y2="15"/></svg>
     </button>
@@ -92,6 +97,25 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
       <span>Snippets</span>
     </button>
+
+    <!-- Backup -->
+    <button class="tool-btn" id="btn-backup" title="Create backup">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Backup</span>
+    </button>
+
+    <!-- Dev Server -->
+    <button class="tool-btn dev-btn" id="btn-dev" title="Start dev server" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg>
+      <span id="btn-dev-label">Dev</span>
+    </button>
+
+    <!-- Deploy -->
+    <button class="tool-btn deploy-btn" id="btn-deploy" title="Run deploy command" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <span>Deploy</span>
+    </button>
+
     <!-- Theme toggle -->
     <button class="tool-btn toggle-btn" id="btn-theme-toggle" title="Toggle light/dark mode">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -102,6 +126,10 @@
     </button>
     <div class="toolbar-divider"></div>
 
+    <button class="revert-btn" id="btn-revert" title="Revert to last manual save" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 1 0 .49-5.51"/></svg>
+      Revert
+    </button>
     <button class="save-btn" id="btn-save">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
       Save
@@ -121,10 +149,16 @@
     <!-- File sidebar -->
     <div class="file-sidebar" id="file-sidebar">
       <div class="sidebar-hd">
-        <span class="sidebar-ws-name" id="sidebar-ws-name">Files</span>
+        <div class="sidebar-hd-name-row">
+          <span class="sidebar-ws-name" id="sidebar-ws-name">Files</span>
+          <span class="sidebar-last-updated" id="sidebar-last-updated"></span>
+        </div>
         <div class="sidebar-hd-btns">
           <button class="sidebar-icon-btn" id="btn-sidebar-new-file" title="New file in workspace">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button class="sidebar-icon-btn" id="btn-add-folder" title="Add files from another folder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
           </button>
           <button class="sidebar-icon-btn" id="btn-sidebar-refresh" title="Refresh">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
@@ -138,44 +172,117 @@
       </div>
       <!-- Files view -->
       <div class="sv-view" id="sv-files-view">
+        <div class="sidebar-sort-bar">
+          <span class="sidebar-sort-label">Sort</span>
+          <select id="sidebar-sort" class="sidebar-sort-select">
+            <option value="name-asc">Name A→Z</option>
+            <option value="name-desc">Name Z→A</option>
+            <option value="type">By Type</option>
+          </select>
+        </div>
         <div class="sidebar-files" id="sidebar-files"></div>
+        <div class="sidebar-autosave-status" id="sidebar-autosave-status" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+          <span id="sidebar-autosave-label">Auto-save on</span>
+        </div>
       </div>
       <!-- Search view -->
       <div class="sv-view" id="sv-search-view" style="display:none">
         <div class="sv-search-bar">
-          <input type="text" id="sv-search-input" placeholder="Search in workspace…" autocomplete="off">
+          <input type="text" id="sv-search-input" placeholder="Search files & folders…" autocomplete="off">
           <button class="sidebar-icon-btn" id="btn-sv-search" title="Search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </button>
         </div>
+        <div class="sv-mode-bar">
+          <select id="sv-search-mode" class="sv-mode-select">
+            <option value="files">Files &amp; Folders</option>
+            <option value="text">Text in Files</option>
+          </select>
+        </div>
         <div class="sv-search-results" id="sv-search-results">
-          <div class="sv-search-hint">Type to search across all files</div>
+          <div class="sv-search-hint">Type to search…</div>
         </div>
       </div>
     </div>
 
-    <!-- Editor section -->
-    <div class="editor-section" id="editor-section">
-      <div class="tab-bar" id="tab-bar">
-        <div class="tabs-scroll" id="tabs-scroll">
-          <div class="tabs-list" id="tabs-list"></div>
+    <!-- Editor + Terminal column -->
+    <div class="editor-col" id="editor-col">
+
+      <!-- Editor section -->
+      <div class="editor-section" id="editor-section">
+        <div class="tab-bar" id="tab-bar">
+          <div class="tabs-scroll" id="tabs-scroll">
+            <div class="tabs-list" id="tabs-list"></div>
+          </div>
+          <button class="tab-new-btn" id="btn-new-tab" title="New file">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
         </div>
-        <button class="tab-new-btn" id="btn-new-tab" title="New file">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
-      </div>
-      <div class="file-changed-banner" id="file-changed-banner" style="display:none">
-        <span id="file-changed-msg">File changed on disk</span>
-        <div class="file-changed-actions">
-          <button id="btn-file-reload">Reload</button>
-          <button id="btn-file-dismiss">Dismiss</button>
+        <div class="file-changed-banner" id="file-changed-banner" style="display:none">
+          <span id="file-changed-msg">File changed on disk</span>
+          <div class="file-changed-actions">
+            <button id="btn-file-reload">Reload</button>
+            <button id="btn-file-dismiss">Dismiss</button>
+          </div>
+        </div>
+        <div id="monaco-container"></div>
+        <!-- Empty workspace onboarding state -->
+        <div class="empty-ws" id="empty-ws" style="display:none">
+          <div class="ew-inner">
+            <svg class="ew-arrow" viewBox="0 0 90 92" xmlns="http://www.w3.org/2000/svg">
+              <path d="M52 90 L52 48 Q52 30 36 30 L14 30"
+                    fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 30 L16 19 L16 41 Z" fill="currentColor"/>
+            </svg>
+            <p class="ew-label">Navigate your files using the sidebar</p>
+            <p class="ew-sub">Or set a default file to open automatically when this workspace loads</p>
+            <button class="ew-btn" id="btn-ew-set-default">Set Default File</button>
+          </div>
+        </div>
+        <!-- Image preview (replaces Monaco for image files) -->
+        <div class="image-preview-area" id="image-preview-area" style="display:none">
+          <img id="image-preview-img" src="" alt="Preview">
+          <div class="image-preview-info" id="image-preview-info"></div>
+        </div>
+        <div class="no-preview-bar" id="no-preview-bar" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Preview unavailable — no visual output for this file type
         </div>
       </div>
-      <div id="monaco-container"></div>
-    </div>
+
+      <!-- Terminal panel -->
+      <div class="terminal-panel" id="terminal-panel" style="display:none" tabindex="-1">
+        <div class="terminal-header">
+          <div class="terminal-tabs">
+            <span class="terminal-tab active">Terminal</span>
+          </div>
+          <div class="terminal-header-btns">
+            <button class="term-btn" id="btn-term-kill" title="Stop (Ctrl+C)" style="display:none">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+            </button>
+            <button class="term-btn" id="btn-term-clear" title="Clear">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+            </button>
+            <button class="term-btn" id="btn-term-close" title="Close terminal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="terminal-output" id="terminal-output"></div>
+        <div class="terminal-live-area" id="terminal-live-area">
+          <span class="term-live-prompt" id="terminal-live-prompt">C:\&gt;</span>
+          <input class="terminal-inline-input" id="terminal-input" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="terminal-status" id="terminal-status"></div>
+      </div>
+
+    </div><!-- /editor-col -->
 
     <!-- Pane resizer -->
     <div class="pane-resizer" id="pane-resizer"></div>
+    <!-- Transparent overlay captures mouse during drag so iframe doesn't steal events -->
+    <div id="drag-capture" style="display:none;position:fixed;inset:0;z-index:9999;cursor:col-resize"></div>
 
     <!-- Preview section -->
     <div class="preview-section" id="preview-section">
@@ -197,10 +304,19 @@
           </button>
         </div>
       </div>
+      <div class="preview-warning-bar" id="preview-warning-bar" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;width:15px;height:15px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>This HTML might not render a preview (framework or empty body).</span>
+        <div class="pwb-actions">
+          <button id="btn-preview-try">Try Anyway</button>
+          <button id="btn-preview-hide">Hide Preview</button>
+        </div>
+      </div>
       <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin" title="Preview"></iframe>
       <div class="no-preview" id="no-preview" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg>
-        <span id="no-preview-label">No visual preview for this file type</span>
+        <span id="no-preview-label">Unable to draw a preview for this file type.</span>
+        <button class="no-preview-switch-btn" id="btn-no-preview-switch">Switch to Code</button>
       </div>
     </div>
   </div>
@@ -218,6 +334,7 @@
   <!-- Sidebar context menu -->
   <div class="ctx-menu" id="sidebar-ctx" style="display:none;position:fixed;z-index:9999">
     <div class="ctx-item" id="sctx-open">Open</div>
+    <div class="ctx-item" id="sctx-pin">📌 Pin to top</div>
     <div class="ctx-item" id="sctx-rename">Rename</div>
     <div class="ctx-divider"></div>
     <div class="ctx-item" id="sctx-explorer">Show in Explorer</div>
@@ -231,54 +348,168 @@
     <div id="snip-list"></div>
   </div>
 
-  <!-- Settings modal -->
-  <div class="modal-overlay" id="settings-modal" style="display:none">
-    <div class="modal">
-      <div class="modal-header">
-        <span class="modal-title">Settings</span>
-        <button class="modal-close" id="btn-settings-close">✕</button>
+  <!-- Quick-open palette (Ctrl+P) -->
+  <div class="qo-overlay" id="qo-overlay" style="display:none">
+    <div class="qo-box">
+      <div class="qo-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="qo-input" id="qo-input" placeholder="Search files…" autocomplete="off" spellcheck="false">
+        <span class="qo-hint">ESC to close</span>
       </div>
-      <div class="modal-body">
-        <div class="setting-section">EDITOR</div>
-        <div class="setting-row">
-          <label class="setting-label">Font Family</label>
-          <select class="setting-select" id="set-font-family">
-            <option value="'Cascadia Code','Fira Code',Consolas,monospace">Cascadia Code</option>
-            <option value="'Fira Code',Consolas,monospace">Fira Code</option>
-            <option value="Consolas,monospace">Consolas</option>
-            <option value="'Courier New',monospace">Courier New</option>
-          </select>
+      <div class="qo-results" id="qo-results"></div>
+    </div>
+  </div>
+
+  <!-- New File modal -->
+  <div class="modal-overlay" id="nf-modal" style="display:none">
+    <div class="modal nf-modal-box">
+      <div class="modal-header">
+        <span class="modal-title">New File</span>
+        <button type="button" class="modal-close" id="btn-nf-close">&#x2715;</button>
+      </div>
+      <div class="modal-body nf-modal-body">
+
+        <div class="nf-label">Destination</div>
+        <div class="nf-dest-row">
+          <div class="nf-dest-path" id="nf-dest-path"></div>
+          <button type="button" class="nf-browse-btn" id="btn-nf-browse">Browse</button>
         </div>
-        <div class="setting-row">
-          <label class="setting-label">Font Size</label>
-          <div class="setting-slider-row">
-            <input type="range" id="set-font-size" min="10" max="24" value="13">
-            <span class="setting-slider-val" id="set-font-size-val">13px</span>
+        <div class="nf-outside-warn" id="nf-outside-warn" style="display:none">
+          <span class="nf-warn-title">&#x26A0; This folder is outside your workspace.</span>
+          <div class="nf-warn-actions">
+            <button type="button" class="nf-warn-btn" id="btn-nf-add-ws">+ Add to workspace</button>
+            <button type="button" class="nf-warn-btn" id="btn-nf-just-file">Just add this file</button>
+            <button type="button" class="nf-warn-back" id="btn-nf-change-dest">&#x2190; Change destination</button>
           </div>
         </div>
-        <div class="setting-row">
-          <label class="setting-label">Tab Size</label>
-          <select class="setting-select" id="set-tab-size">
-            <option value="2">2 spaces</option>
-            <option value="4">4 spaces</option>
-          </select>
+
+        <div class="nf-label" style="margin-top:16px">File Type</div>
+        <div class="nf-type-grid" id="nf-type-grid"></div>
+
+        <div class="nf-label" style="margin-top:16px">File Name</div>
+        <div class="nf-name-row">
+          <input type="text" class="nf-name-input" id="nf-name-input" spellcheck="false" autocomplete="off" placeholder="untitled">
+          <span class="nf-ext" id="nf-ext">.html</span>
         </div>
-        <div class="setting-section" style="margin-top:16px">DEFAULTS</div>
-        <div class="setting-row">
-          <label class="setting-label">Layout</label>
-          <select class="setting-select" id="set-layout">
-            <option value="split">Split view</option>
-            <option value="code">Code only</option>
-            <option value="preview">Preview only</option>
-          </select>
-        </div>
-        <div class="setting-check"><label><input type="checkbox" id="set-minimap"> Show minimap by default</label></div>
-        <div class="setting-check"><label><input type="checkbox" id="set-wordwrap"> Word wrap by default</label></div>
-        <div class="setting-check"><label><input type="checkbox" id="set-autosave"> Auto-save by default</label></div>
+
       </div>
       <div class="modal-footer">
-        <button class="modal-cancel-btn" id="btn-settings-cancel">Cancel</button>
-        <button class="save-btn" id="btn-settings-save">Save Settings</button>
+        <button type="button" class="modal-cancel-btn" id="btn-nf-cancel">Cancel</button>
+        <button type="button" class="btn-primary" id="btn-nf-create" disabled>Create File</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Autosave confirmation -->
+  <div class="modal-overlay" id="autosave-confirm-modal" style="display:none">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <span class="modal-title">Enable Auto-Save?</span>
+      </div>
+      <div class="modal-body" style="padding:16px 20px 4px">
+        <p style="margin:0 0 10px;line-height:1.6;font-size:13px">Auto-save writes your file to disk a few seconds after every keystroke, so you never lose work from a crash or a forgotten save.</p>
+        <p style="margin:0 0 10px;line-height:1.6;font-size:13px">Keep in mind: if the timer fires while you're mid-edit, the incomplete change will be committed to disk — particularly worth noting for config files, structured data, or anything syntax-sensitive.</p>
+        <p style="margin:0 0 16px;line-height:1.6;font-size:13px">A <strong>Revert</strong> button will appear in the toolbar whenever auto-save has drifted from your last manual save (Ctrl+S), letting you recover the last intentional version in one click.</p>
+      </div>
+      <div class="modal-footer" style="gap:8px">
+        <button class="btn-secondary" id="btn-autosave-cancel">Cancel</button>
+        <button class="btn-primary" id="btn-autosave-confirm">Enable Auto-Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Format-on-save prompt -->
+  <div class="modal-overlay" id="fmt-modal" style="display:none">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <span class="modal-title">Format on save?</span>
+      </div>
+      <div class="modal-body" style="padding-bottom:8px">
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Automatically format code before saving?</p>
+        <label class="fmt-dna-label"><input type="checkbox" id="fmt-dna"> Don't ask me again</label>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-cancel-btn" id="btn-fmt-no">No</button>
+        <button class="save-btn" id="btn-fmt-yes">Yes, Format &amp; Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deploy config modal -->
+  <div class="modal-overlay" id="deploy-modal" style="display:none">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <span class="modal-title">Deploy Command</span>
+        <button class="modal-close" id="btn-deploy-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="deploy-ws-label" id="deploy-ws-label"></p>
+        <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+          <label class="setting-label">Command to run</label>
+          <input class="deploy-cmd-input" id="deploy-cmd-input" placeholder="e.g. npm run build" spellcheck="false">
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:10px">Runs in CMD at the workspace root. Output shown in terminal panel.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-cancel-btn" id="btn-deploy-cancel">Cancel</button>
+        <button class="save-btn" id="btn-deploy-save">Save &amp; Deploy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings panel injected by settings.js -->
+
+  <!-- Backup modal -->
+  <div class="modal-overlay" id="backup-modal" style="display:none">
+    <div class="modal modal-sm" style="width:480px">
+      <div class="modal-header">
+        <span class="modal-title">Create Workspace Backup</span>
+        <button class="modal-close" id="btn-backup-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="backup-field-row">
+          <label class="backup-label">Backup name</label>
+          <input class="backup-input" id="backup-name-input" type="text" spellcheck="false" placeholder="my-backup">
+        </div>
+        <div class="backup-field-row" style="margin-top:14px">
+          <label class="backup-label">Save to</label>
+          <div class="backup-dest-row">
+            <input class="backup-input backup-dest-input" id="backup-dest-input" type="text" spellcheck="false" readonly>
+            <button class="backup-browse-btn" id="btn-backup-browse">Browse…</button>
+          </div>
+        </div>
+        <div id="backup-status" class="backup-status" style="display:none"></div>
+        <div class="backup-hint">Saved as a standard .zip file. To restore, right-click it in File Explorer and choose <b>Extract All…</b></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-cancel-btn" id="btn-backup-cancel">Cancel</button>
+        <button class="save-btn" id="btn-backup-create">Create Backup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact modal -->
+  <div class="modal-overlay" id="contact-modal" style="display:none">
+    <div class="modal modal-sm" style="width:440px">
+      <div class="modal-header">
+        <span class="modal-title">Contact Us</span>
+        <button class="modal-close" id="btn-contact-close">✕</button>
+      </div>
+      <div class="modal-body" id="contact-body">
+        <div class="contact-fields">
+          <div class="contact-field-row">
+            <input class="contact-input" id="contact-name"    type="text"  placeholder="Your name"      autocomplete="off">
+            <input class="contact-input" id="contact-email"   type="email" placeholder="your@email.com" autocomplete="off">
+          </div>
+          <input class="contact-input" id="contact-subject" type="text" placeholder="Subject" autocomplete="off">
+          <textarea class="contact-input contact-textarea" id="contact-message" placeholder="Tell us what's on your mind…" rows="5"></textarea>
+          <p class="contact-hint">Or email us directly at <strong>htmledger@localhost314.com</strong></p>
+          <div id="contact-error" class="contact-error" style="display:none"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-cancel-btn" id="btn-contact-cancel">Cancel</button>
+        <button class="btn-primary" id="btn-contact-send">Send Message</button>
       </div>
     </div>
   </div>
@@ -298,6 +529,7 @@
       }
     };
   </script>
+  <script src="settings.js"></script>
   <script src="../node_modules/monaco-editor/min/vs/loader.js"></script>
   <script src="editor.js"></script>
 </body>

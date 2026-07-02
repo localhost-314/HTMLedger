@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HTMLedger</title>
   <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="settings.css">
 </head>
 <body>
   <!-- Custom title bar -->
@@ -44,7 +45,7 @@
       <div class="sidebar-label">OPEN</div>
       <button class="sidebar-btn" id="btn-open-folder">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-        Open Folder
+        New Workspace
       </button>
       <button class="sidebar-btn" id="btn-open-file">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
@@ -61,6 +62,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <span id="theme-label">Light Mode</span>
       </button>
+      <button class="sidebar-btn" id="btn-settings-home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </button>
     </div>
 
   <!-- Update banner -->
@@ -76,7 +81,6 @@
     <!-- Top bar -->
     <div class="topbar">
       <div class="topbar-left">
-        <!-- Breadcrumb -->
         <div class="breadcrumb" id="breadcrumb">
           <span class="bc-home" id="bc-home">Home</span>
           <svg class="bc-sep" id="bc-sep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:none"><polyline points="9,18 15,12 9,6"/></svg>
@@ -99,11 +103,11 @@
           <option value="type">By type</option>
         </select>
         <div class="view-toggle">
-          <button class="view-btn active" id="view-grid" title="Grid view">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-          </button>
-          <button class="view-btn" id="view-list" title="List view">
+          <button class="view-btn active" id="view-list" title="List view">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+          <button class="view-btn" id="view-grid" title="Grid view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
           </button>
         </div>
         <button class="create-btn" id="btn-new-file" style="display:none">
@@ -121,7 +125,7 @@
           <div class="landing-logo">
             <span class="logo-bracket">&lt;</span>HTMLedger<span class="logo-bracket">/&gt;</span>
           </div>
-          <p class="landing-sub">Your HTML workspace</p>
+          <p class="landing-sub">Your code workspace &mdash; <a class="compat-link" id="compat-link" href="#">see compatible file types</a></p>
         </div>
         <div class="landing-actions">
           <button class="landing-action-btn" id="land-open-folder">
@@ -129,8 +133,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
             </div>
             <div class="la-text">
-              <span class="la-title">Open Folder</span>
-              <span class="la-desc">Open a folder as a workspace</span>
+              <span class="la-title">New Workspace</span>
+              <span class="la-desc">Create a named workspace from one or more folders</span>
             </div>
           </button>
           <button class="landing-action-btn" id="land-open-file">
@@ -139,7 +143,7 @@
             </div>
             <div class="la-text">
               <span class="la-title">Open File</span>
-              <span class="la-desc">Open a single HTML file</span>
+              <span class="la-desc">Open a compatible file</span>
             </div>
           </button>
           <button class="landing-action-btn" id="land-new-file">
@@ -148,14 +152,14 @@
             </div>
             <div class="la-text">
               <span class="la-title">New File</span>
-              <span class="la-desc">Create a new HTML file</span>
+              <span class="la-desc">Create a new file</span>
             </div>
           </button>
         </div>
 
-        <!-- Recent workspaces -->
+        <!-- Workspaces -->
         <div class="recent-section" id="recent-section" style="display:none">
-          <div class="recent-label">Recent Workspaces</div>
+          <div class="recent-label">Workspaces</div>
           <div class="recent-list" id="recent-list"></div>
         </div>
         <!-- Recent files -->
@@ -175,8 +179,8 @@
             <path d="M22 35h25M22 45h20M22 55h15" stroke="#6060a0" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </div>
-        <h2>No HTML files in this folder</h2>
-        <p>Create a new file to get started</p>
+        <h2>No compatible files in this folder</h2>
+        <p>Create a new file or <a class="compat-link" id="compat-link-empty" href="#">view supported types</a></p>
         <div class="empty-actions">
           <button class="create-btn" id="empty-new-file">New File</button>
         </div>
@@ -184,6 +188,7 @@
 
       <!-- File grid -->
       <div class="file-grid" id="file-grid" style="display:none"></div>
+
     </div>
   </div>
 
@@ -215,6 +220,157 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
+  <!-- New File modal -->
+  <div class="modal-overlay" id="nf-modal" style="display:none">
+    <div class="modal nf-modal-box">
+      <div class="modal-header">
+        <span class="modal-title">New File</span>
+        <button type="button" class="modal-close" id="btn-nf-close">&#x2715;</button>
+      </div>
+      <div class="modal-body nf-modal-body">
+
+        <div class="nf-label">Destination</div>
+        <div class="nf-dest-row">
+          <div class="nf-dest-path" id="nf-dest-path"></div>
+          <button type="button" class="nf-browse-btn" id="btn-nf-browse">Browse</button>
+        </div>
+        <div class="nf-outside-warn" id="nf-outside-warn" style="display:none">
+          <span class="nf-warn-title">&#x26A0; This folder is outside your current location.</span>
+          <div class="nf-warn-actions">
+            <button type="button" class="nf-warn-btn" id="btn-nf-just-file">Just add this file</button>
+            <button type="button" class="nf-warn-back" id="btn-nf-change-dest">&#x2190; Change destination</button>
+          </div>
+        </div>
+
+        <div class="nf-label" style="margin-top:16px">File Type</div>
+        <div class="nf-type-grid" id="nf-type-grid"></div>
+
+        <div class="nf-label" style="margin-top:16px">File Name</div>
+        <div class="nf-name-row">
+          <input type="text" class="nf-name-input" id="nf-name-input" spellcheck="false" autocomplete="off" placeholder="untitled">
+          <span class="nf-ext" id="nf-ext">.html</span>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-cancel-btn" id="btn-nf-cancel">Cancel</button>
+        <button type="button" class="btn-primary" id="btn-nf-create" disabled>Create File</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compatible file types modal -->
+  <div class="modal-overlay" id="compat-modal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Compatible File Types</span>
+        <button class="modal-close" id="btn-compat-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="compat-grid">
+          <div class="compat-row"><span class="compat-exts"><span class="compat-badge badge-html">HTML</span><span class="compat-badge badge-html">HTM</span></span><span class="compat-desc">HTML pages — full live preview</span></div>
+          <div class="compat-row"><span class="compat-exts"><span class="compat-badge badge-css">CSS</span></span><span class="compat-desc">Stylesheets</span></div>
+          <div class="compat-row"><span class="compat-exts"><span class="compat-badge badge-js">JS</span><span class="compat-badge badge-js">JSX</span></span><span class="compat-desc">JavaScript &amp; React JSX</span></div>
+          <div class="compat-row"><span class="compat-exts"><span class="compat-badge badge-ts">TS</span><span class="compat-badge badge-ts">TSX</span></span><span class="compat-desc">TypeScript &amp; TSX</span></div>
+          <div class="compat-row"><span class="compat-exts"><span class="compat-badge badge-json">JSON</span></span><span class="compat-desc">JSON data files</span></div>
+          <div class="compat-row"><span class="compat-exts"><span class="compat-badge badge-xml">XML</span><span class="compat-badge badge-xml">SVG</span></span><span class="compat-desc">XML &amp; SVG markup — structured preview</span></div>
+          <div class="compat-row"><span class="compat-exts"><span class="compat-badge badge-md">MD</span></span><span class="compat-desc">Markdown documents</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-close-btn" id="btn-compat-done">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings panel injected by settings.js -->
+
+  <!-- Contact modal -->
+  <div class="modal-overlay" id="contact-modal" style="display:none">
+    <div class="modal modal-sm" style="width:440px">
+      <div class="modal-header">
+        <span class="modal-title">Contact Us</span>
+        <button class="modal-close" id="btn-contact-close">✕</button>
+      </div>
+      <div class="modal-body" id="contact-body">
+        <div class="contact-fields">
+          <div class="contact-field-row">
+            <input class="contact-input" id="contact-name"    type="text"  placeholder="Your name"          autocomplete="off">
+            <input class="contact-input" id="contact-email"   type="email" placeholder="your@email.com"     autocomplete="off">
+          </div>
+          <input class="contact-input" id="contact-subject" type="text"  placeholder="Subject"               autocomplete="off">
+          <textarea class="contact-input contact-textarea" id="contact-message" placeholder="Tell us what's on your mind…" rows="5"></textarea>
+          <p class="contact-hint">Or email us directly at <strong>htmledger@localhost314.com</strong></p>
+          <div id="contact-error" class="contact-error" style="display:none"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-cancel-btn" id="btn-contact-cancel">Cancel</button>
+        <button class="btn-primary" id="btn-contact-send">Send Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New / Edit Workspace modal -->
+  <div class="modal-overlay" id="ws-modal" style="display:none">
+    <div class="modal modal-sm" style="width:480px">
+      <div class="modal-header">
+        <span class="modal-title" id="ws-modal-title">New Workspace</span>
+        <button class="modal-close" id="btn-ws-modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="ws-field-group">
+          <label class="ws-label">Workspace Name</label>
+          <input class="contact-input" id="ws-name-input" type="text" placeholder="e.g. My React App" autocomplete="off">
+        </div>
+        <div class="ws-field-group" style="margin-top:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <label class="ws-label" style="margin:0">Folders</label>
+            <button class="setting-action-btn" id="btn-ws-add-folder">+ Add Folder</button>
+          </div>
+          <div id="ws-folders-list" class="ws-folders-list"></div>
+          <p class="contact-hint" style="margin-top:8px">Add one or more folders to include in this workspace.</p>
+        </div>
+        <div class="ws-field-group" style="margin-top:14px">
+          <label class="ws-label">Deploy Command <span style="opacity:0.5;font-weight:400">(optional)</span></label>
+          <input class="contact-input" id="ws-deploy-input" type="text" placeholder="e.g. npm run build" autocomplete="off">
+        </div>
+        <div class="ws-field-group" style="margin-top:14px">
+          <label class="ws-label">Theme Override <span style="opacity:0.5;font-weight:400">(optional)</span></label>
+          <select class="sort-select" id="ws-theme-select" style="width:100%;padding:7px 10px;font-size:12px">
+            <option value="">Follow system setting</option>
+            <option value="dark">Always Dark</option>
+            <option value="light">Always Light</option>
+          </select>
+        </div>
+        <div id="ws-conflict-warning" class="contact-error" style="display:none;margin-top:12px"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-cancel-btn" id="btn-ws-modal-cancel">Cancel</button>
+        <button class="btn-primary" id="btn-ws-modal-save">Create Workspace</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Migration prompt modal -->
+  <div class="modal-overlay" id="migration-modal" style="display:none">
+    <div class="modal modal-sm" style="width:460px">
+      <div class="modal-header">
+        <span class="modal-title">Welcome to Workspaces</span>
+      </div>
+      <div class="modal-body">
+        <p style="margin:0 0 10px;line-height:1.6;font-size:13px">HTMLedger now uses <strong>Workspaces</strong> — named collections of one or more folders with their own settings (deploy command, theme, and more).</p>
+        <p style="margin:0 0 10px;line-height:1.6;font-size:13px">You have existing folders from a previous session. Would you like to automatically convert them into workspaces, or start fresh?</p>
+        <p style="margin:0;font-size:11px;color:var(--text-muted)">Converting will name each workspace after its folder. You can rename or edit them at any time.</p>
+      </div>
+      <div class="modal-footer" style="gap:8px">
+        <button class="modal-cancel-btn" id="btn-migrate-fresh">Start Fresh</button>
+        <button class="btn-primary" id="btn-migrate-convert">Convert My Folders</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
   <script src="home.js"></script>
 </body>
 </html>
