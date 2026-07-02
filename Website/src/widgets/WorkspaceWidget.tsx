@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import './WorkspaceWidget.css';
 
 interface FileCard {
   name: string;
-  type: 'html' | 'css' | 'js' | 'xml' | 'json';
+  type: 'html' | 'css' | 'tsx' | 'ts' | 'json' | 'xml' | 'md';
   size: string;
   lines: number;
   preview: string;
@@ -11,21 +11,35 @@ interface FileCard {
 
 const FILES: FileCard[] = [
   { name: 'index.html',       type: 'html', size: '4.2 KB', lines: 87,  preview: '<!DOCTYPE html>\n<html lang="en">\n<head>…' },
-  { name: 'style.css',        type: 'css',  size: '6.8 KB', lines: 214, preview: '* { box-sizing: border-box; }\nbody {\n  background: #0f0f1a;…' },
-  { name: 'script.js',        type: 'js',   size: '3.1 KB', lines: 94,  preview: 'document.addEventListener(\n  "DOMContentLoaded",\n  () => {…' },
+  { name: 'styles.css',       type: 'css',  size: '6.8 KB', lines: 214, preview: ':root {\n  --primary: #4f6ef7;\n  --bg: #0f0f1a;\n}…' },
+  { name: 'App.tsx',          type: 'tsx',  size: '3.9 KB', lines: 118, preview: 'export default function App() {\n  return (\n    <div className="app">…' },
+  { name: 'api.ts',           type: 'ts',   size: '2.3 KB', lines: 78,  preview: 'interface ApiResponse {\n  data: unknown;\n  status: number;\n}…' },
   { name: 'about.html',       type: 'html', size: '2.9 KB', lines: 63,  preview: '<!DOCTYPE html>\n<html>\n<body>\n  <section class="about">…' },
-  { name: 'contact.html',     type: 'html', size: '3.4 KB', lines: 72,  preview: '<form class="contact-form">\n  <input type="text"\n    name="name">…' },
+  { name: 'config.json',      type: 'json', size: '1.1 KB', lines: 24,  preview: '{\n  "name": "my-website",\n  "version": "1.0.0",\n  "scripts": {…' },
+  { name: 'README.md',        type: 'md',   size: '0.8 KB', lines: 18,  preview: '# My Website\n\nA modern web project\nbuilt with HTMLedger.…' },
   { name: 'dmarc-report.xml', type: 'xml',  size: '1.8 KB', lines: 42,  preview: '<?xml version="1.0"?>\n<feedback>\n  <report_metadata>…' },
 ];
 
 const TYPE_LABELS: Record<string, string> = {
-  html: 'HTML', css: 'CSS', js: 'JS', xml: 'XML', json: 'JSON',
+  html: 'HTML', css: 'CSS', tsx: 'TSX', ts: 'TS',
+  json: 'JSON', xml: 'XML', md: 'MD',
 };
 
+const CTX_ITEMS = ['Open →', 'Rename', 'Duplicate', '—', 'Open in Explorer', 'Delete'];
+
+interface CtxMenu { x: number; y: number; file: string; }
+
 export default function WorkspaceWidget() {
-  const [query, setQuery] = useState('');
-  const [sort, setSort] = useState<'name' | 'type' | 'size'>('name');
-  const [active, setActive] = useState<string | null>(null);
+  const [query, setQuery]     = useState('');
+  const [sort, setSort]       = useState<'name' | 'type' | 'size'>('name');
+  const [active, setActive]   = useState<string | null>(null);
+  const [ctxMenu, setCtxMenu] = useState<CtxMenu | null>(null);
+
+  useEffect(() => {
+    const close = () => setCtxMenu(null);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
@@ -36,6 +50,12 @@ export default function WorkspaceWidget() {
       return a.name.localeCompare(b.name);
     });
   }, [query, sort]);
+
+  const onCtx = (e: React.MouseEvent, name: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCtxMenu({ x: e.clientX, y: e.clientY, file: name });
+  };
 
   return (
     <div className="ww-wrap">
@@ -73,6 +93,7 @@ export default function WorkspaceWidget() {
             key={f.name}
             className={`ww-card ${active === f.name ? 'active' : ''}`}
             onClick={() => setActive(v => v === f.name ? null : f.name)}
+            onContextMenu={e => onCtx(e, f.name)}
           >
             <div className="ww-card-top">
               <span className={`badge badge-${f.type}`}>{TYPE_LABELS[f.type]}</span>
@@ -87,6 +108,29 @@ export default function WorkspaceWidget() {
           </div>
         ))}
       </div>
+
+      {ctxMenu && (
+        <div
+          className="ww-ctx-menu"
+          style={{ left: ctxMenu.x, top: ctxMenu.y }}
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="ww-ctx-file">{ctxMenu.file}</div>
+          {CTX_ITEMS.map((item, i) =>
+            item === '—' ? (
+              <div key={i} className="ww-ctx-sep" />
+            ) : (
+              <button
+                key={item}
+                className={`ww-ctx-item${item === 'Delete' ? ' danger' : ''}`}
+                onClick={() => setCtxMenu(null)}
+              >
+                {item}
+              </button>
+            )
+          )}
+        </div>
+      )}
     </div>
   );
 }
