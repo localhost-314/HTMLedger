@@ -944,7 +944,7 @@ img { max-width: 100%; height: auto; display: block; }
   gap: 1.5rem;
   align-items: start;
 }
-.hub-cards--hero { margin-top: 1.75rem; width: 100%; }
+.hub-cards--hero { margin-top: 1.75rem; width: 100%; margin-bottom: 2rem; }
 @media (max-width: 780px) {
   .hub-cards { grid-template-columns: 1fr; }
   .hub-vs { display: none; }
