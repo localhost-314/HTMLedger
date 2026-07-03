@@ -91,19 +91,20 @@ export default function Contact() {
       if (form.subject.trim())  payload.subject = form.subject.trim();
       if (tokenRef.current)     payload.cfToken = tokenRef.current;
 
-      const res  = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      const data = await res.json() as { success?: boolean; code?: number };
+      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      let data: { success?: boolean; code?: number } = {};
+      try { data = await res.json(); } catch { /* non-JSON body */ }
       if (data.success) {
         setSuccess(true);
         setForm(EMPTY);
         resetTurnstile();
       } else {
-        const code = data.code ? ` (${data.code})` : '';
-        setError(`Something went wrong${code}. Email us at htmledger@localhost314.com`);
+        const code = data.code ?? res.status;
+        setError(`Something went wrong (${code}). Email us at htmledger@localhost314.com`);
         resetTurnstile();
       }
     } catch {
-      setError('Could not reach the server.. Email us at htmledger@localhost314.com');
+      setError('Could not reach the server. Email us at htmledger@localhost314.com');
     } finally {
       setLoading(false);
     }
