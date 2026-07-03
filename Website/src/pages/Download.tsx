@@ -1,5 +1,5 @@
-const DOWNLOAD_URL = 'https://github.com/localhost-314/HTMLedger/releases/latest/download/HTMLedger.Setup.1.0.2.exe';
-const VERSION = '1.0.2';
+const DOWNLOAD_URL = 'https://github.com/localhost-314/HTMLedger/releases/latest/download/HTMLedger.Setup.2.0.0.exe';
+const VERSION = '2.0.0';
 
 export default function Download() {
   return (
