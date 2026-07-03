@@ -25,6 +25,14 @@
       "repo": "HTMLedger",
       "releaseType": "release"
     },
+    "fileAssociations": [
+      {
+        "ext": ["html", "htm", "css", "js", "jsx", "ts", "tsx", "json", "xml", "svg", "md"],
+        "name": "HTMLedger Document",
+        "description": "Open with HTMLedger",
+        "role": "Editor"
+      }
+    ],
     "files": [
       "**/*",
       "!node_modules/.cache"

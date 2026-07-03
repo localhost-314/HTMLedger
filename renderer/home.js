@@ -1045,3 +1045,13 @@ initTheme();
 initCompat();
 initSettings();
 initUpdater();
+
+// "Open with" / double-click: open file directly in editor
+if (window.api?.onOpenFileArgv) {
+  window.api.onOpenFileArgv(filePath => {
+    sessionStorage.setItem('edit-file', filePath);
+    sessionStorage.removeItem('active-workspace');
+    sessionStorage.removeItem('workspace-folder');
+    window.location.href = 'editor.html';
+  });
+}
