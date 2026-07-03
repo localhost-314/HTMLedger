@@ -426,6 +426,77 @@ img { max-width: 100%; height: auto; display: block; }
 .dl-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
 .dl-card p { font-size: 0.875rem; color: var(--text-secondary); }
 
+/* Open source blip */
+.dl-opensource-blip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: rgba(96, 165, 250, 0.08);
+  border-bottom: 1px solid rgba(96, 165, 250, 0.18);
+  padding: 0.6rem 1.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  text-align: center;
+  flex-wrap: wrap;
+}
+.dl-opensource-blip--lite {
+  background: rgba(129, 140, 248, 0.08);
+  border-bottom-color: rgba(129, 140, 248, 0.18);
+}
+.dl-opensource-blip a { color: var(--accent); font-weight: 500; }
+.dl-opensource-blip a:hover { text-decoration: underline; }
+.dl-opensource-dot { width: 7px; height: 7px; background: #60a5fa; border-radius: 50%; flex-shrink: 0; }
+
+/* Source links below main download button */
+.dl-source-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+}
+.dl-github-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: #24292e;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+  cursor: pointer;
+}
+.dl-github-btn:hover { background: #3a3f45; transform: translateY(-1px); }
+.dl-github-btn--lite { border-color: rgba(129, 140, 248, 0.3); }
+.dl-github-logo { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
+.dl-source-zip {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.dl-source-zip:hover { color: var(--text-secondary); }
+
+/* Cross-promo strip */
+.dl-also-lite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 3rem;
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.dl-also-lite-link { color: #818cf8; font-weight: 500; }
+.dl-also-lite-link:hover { text-decoration: underline; }
+
 /* ===== Contact page ===== */
 .contact-page { padding-top: 8rem; padding-bottom: 6rem; }
 .contact-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 4rem; align-items: start; }
