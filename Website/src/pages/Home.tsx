@@ -46,19 +46,17 @@ export default function Home() {
 
   return (
     <>
-      {/* ── Hero ── */}
+      {/* ── Hero + Both Apps Above the Fold ── */}
       <section className="hero hub-hero">
         <div className="hero-bg-glow hub-glow" />
         <div className="hero-bg-grid" />
         <div className="hub-hero-inner">
           <div className="hero-tag">HTMLedger</div>
-          <h1 className="hero-title">
-            Two editors.<br />Both free.<br />Pick yours.
+          <h1 className="hero-title hub-hero-title">
+            Two editors.<br />Both free.
           </h1>
-          <p className="hero-sub">
-            HTMLedger comes in a full-featured edition powered by Monaco,
-            and a lightweight Lite edition built on CodeMirror 6.
-            Same privacy promise. Same zero price. Different power levels.
+          <p className="hero-sub hub-hero-sub">
+            Full Monaco power or ultralight Lite — same privacy, zero price, different power levels.
           </p>
           <div className="trust-pills">
             <span className="trust-pill">🔓 Always free</span>
@@ -66,16 +64,9 @@ export default function Home() {
             <span className="trust-pill">✈️ Offline-first</span>
             <span className="trust-pill">💻 Windows 10/11</span>
           </div>
-          <button className="btn btn-primary btn-lg" onClick={() => open()}>
-            ↓&nbsp;&nbsp;Download Free
-          </button>
-        </div>
-      </section>
 
-      {/* ── Product Cards ── */}
-      <section className="section hub-cards-section">
-        <div className="container">
-          <div className="hub-cards">
+          {/* Both app cards — visible on first load */}
+          <div className="hub-cards hub-cards--hero">
             <div className="hub-card">
               <div className="hub-card-header">
                 <span className="hub-card-badge">Full Edition</span>
@@ -89,7 +80,6 @@ export default function Home() {
                 <li><span className="hub-check">✓</span> Workspace backup &amp; restore</li>
                 <li><span className="hub-check">✓</span> Full Monaco — Emmet, minimap, format</li>
               </ul>
-              <div className="hub-card-size">~150 MB · NSIS installer</div>
               <div className="hub-card-btns">
                 <button className="btn btn-primary" onClick={() => open('main')}>↓ Download Free</button>
                 <Link to="/main" className="btn btn-ghost">Explore →</Link>
@@ -111,7 +101,6 @@ export default function Home() {
                 <li><span className="hub-check hub-check--lite">✓</span> Faster startup, smaller install</li>
                 <li><span className="hub-check hub-check--lite">✓</span> Portable build — no install needed</li>
               </ul>
-              <div className="hub-card-size">~25 MB · portable or installer</div>
               <div className="hub-card-btns">
                 <button className="btn hub-lite-btn" onClick={() => open('lite')}>↓ Download Lite Free</button>
                 <Link to="/lite" className="btn btn-ghost">Explore →</Link>
@@ -119,11 +108,9 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-            <button className="hub-quiz-cta" onClick={openQuiz}>
-              Not sure which is right for you? Take the 1-minute quiz →
-            </button>
-          </div>
+          <button className="hub-quiz-cta" onClick={openQuiz}>
+            Not sure which is right for you? Take the 1-minute quiz →
+          </button>
         </div>
       </section>
 

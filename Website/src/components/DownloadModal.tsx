@@ -4,15 +4,24 @@ import { useNavigate } from 'react-router-dom';
 const QUIZ = [
   {
     q: 'What best describes your project?',
-    a: { lite: 'A few HTML / CSS pages', main: 'Multi-file project with JS, TS, or frameworks' },
+    a: {
+      lite: { text: 'A few HTML / CSS pages', decisive: false },
+      main: { text: 'Multi-file project with JS, TS, or frameworks', decisive: false },
+    },
   },
   {
     q: 'Which tools do you need beyond editing?',
-    a: { lite: 'Just editing, preview, and file management', main: 'Snippets, DMARC analysis, advanced search' },
+    a: {
+      lite: { text: 'Just editing, preview, and file management', decisive: false },
+      main: { text: 'Snippets, DMARC analysis, advanced search', decisive: true },
+    },
   },
   {
     q: 'How important is startup speed?',
-    a: { lite: 'Blazing fast — I open the editor constantly', main: 'Fine either way — I want all the features' },
+    a: {
+      lite: { text: 'Blazing fast — I open the editor constantly', decisive: false },
+      main: { text: 'Fine either way — I want all the features', decisive: false },
+    },
   },
 ];
 
@@ -28,14 +37,18 @@ export default function DownloadModal({ open, hint, startQuiz, onClose }: {
   const [mode, setMode] = useState<Mode>('pick');
   const [step, setStep] = useState(0);
   const [votes, setVotes] = useState<('lite' | 'main')[]>([]);
+  const [forcedResult, setForcedResult] = useState<'main' | 'lite' | null>(null);
 
   useEffect(() => {
-    if (open) { setMode(startQuiz ? 'quiz' : 'pick'); setStep(0); setVotes([]); }
+    if (open) {
+      setMode(startQuiz ? 'quiz' : 'pick');
+      setStep(0);
+      setVotes([]);
+      setForcedResult(null);
+    }
   }, [open, startQuiz]);
 
-  const close = useCallback(() => {
-    onClose();
-  }, [onClose]);
+  const close = useCallback(() => { onClose(); }, [onClose]);
 
   useEffect(() => {
     if (!open) return;
@@ -46,9 +59,30 @@ export default function DownloadModal({ open, hint, startQuiz, onClose }: {
 
   if (!open) return null;
 
-  function answer(pick: 'lite' | 'main') {
+  function resetQuiz() {
+    setStep(0);
+    setVotes([]);
+    setForcedResult(null);
+    setMode('quiz');
+  }
+
+  function answer(pick: 'lite' | 'main', decisive: boolean) {
     const next = [...votes, pick];
     setVotes(next);
+
+    if (decisive) {
+      setForcedResult(pick);
+      setMode('result');
+      return;
+    }
+
+    const mainCount = next.filter(v => v === 'main').length;
+    const remaining = QUIZ.length - next.length;
+    if (mainCount >= 2 || mainCount + remaining < 2) {
+      setMode('result');
+      return;
+    }
+
     if (step + 1 < QUIZ.length) {
       setStep(s => s + 1);
     } else {
@@ -56,7 +90,7 @@ export default function DownloadModal({ open, hint, startQuiz, onClose }: {
     }
   }
 
-  const recommendation = votes.filter(v => v === 'main').length >= 2 ? 'main' : 'lite';
+  const recommendation = forcedResult ?? (votes.filter(v => v === 'main').length >= 2 ? 'main' : 'lite');
 
   return (
     <div className="dlm-backdrop" onClick={close}>
@@ -83,7 +117,6 @@ export default function DownloadModal({ open, hint, startQuiz, onClose }: {
                   <li>✓ Full Monaco editing power</li>
                   <li>✓ Workspace backup &amp; restore</li>
                 </ul>
-                <div className="dlm-card-size">~150 MB · NSIS installer</div>
                 <button className="btn btn-primary" onClick={() => { close(); navigate('/main/download'); }}>
                   ↓ Download HTMLedger
                 </button>
@@ -106,7 +139,6 @@ export default function DownloadModal({ open, hint, startQuiz, onClose }: {
                   <li>✓ Faster startup, smaller footprint</li>
                   <li>✓ All the essentials, nothing wasted</li>
                 </ul>
-                <div className="dlm-card-size">~25 MB · portable or installer</div>
                 <button className="btn dlm-lite-btn" onClick={() => { close(); navigate('/lite/download'); }}>
                   ↓ Download Lite
                 </button>
@@ -116,7 +148,7 @@ export default function DownloadModal({ open, hint, startQuiz, onClose }: {
               </div>
             </div>
 
-            <button className="dlm-quiz-link" onClick={() => setMode('quiz')}>
+            <button className="dlm-quiz-link" onClick={resetQuiz}>
               Not sure which is right for you? Take the 1-minute quiz →
             </button>
           </>
@@ -136,13 +168,13 @@ export default function DownloadModal({ open, hint, startQuiz, onClose }: {
               </h2>
             </div>
             <div className="dlm-quiz-choices">
-              <button className="dlm-choice" onClick={() => answer('lite')}>
+              <button className="dlm-choice" onClick={() => answer('lite', QUIZ[step].a.lite.decisive)}>
                 <span className="dlm-choice-icon">⚡</span>
-                <span>{QUIZ[step].a.lite}</span>
+                <span>{QUIZ[step].a.lite.text}</span>
               </button>
-              <button className="dlm-choice" onClick={() => answer('main')}>
+              <button className="dlm-choice" onClick={() => answer('main', QUIZ[step].a.main.decisive)}>
                 <span className="dlm-choice-icon">🧰</span>
-                <span>{QUIZ[step].a.main}</span>
+                <span>{QUIZ[step].a.main.text}</span>
               </button>
             </div>
             <button className="dlm-quiz-link" onClick={() => setMode('pick')}>
@@ -163,7 +195,7 @@ export default function DownloadModal({ open, hint, startQuiz, onClose }: {
               </h2>
               <p className="dlm-sub">
                 {recommendation === 'main'
-                  ? 'You\'ll get the most out of the full feature set — Monaco, snippets, DMARC, and more.'
+                  ? "You'll get the most out of the full feature set — Monaco, snippets, DMARC, and more."
                   : 'Lite is the right fit — fast, focused, and everything you actually need.'}
               </p>
             </div>
@@ -175,7 +207,10 @@ export default function DownloadModal({ open, hint, startQuiz, onClose }: {
               >
                 ↓ Download {recommendation === 'main' ? 'HTMLedger' : 'Lite'} Free
               </button>
-              <button className="dlm-quiz-link" onClick={() => { setMode('pick'); setStep(0); setVotes([]); }}>
+              <button className="dlm-quiz-link" onClick={resetQuiz}>
+                ↺ Retake quiz
+              </button>
+              <button className="dlm-quiz-link" onClick={() => { setMode('pick'); setStep(0); setVotes([]); setForcedResult(null); }}>
                 ← See both versions
               </button>
             </div>
