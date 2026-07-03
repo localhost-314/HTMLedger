@@ -339,3 +339,13 @@
 }
 .usp-confirm-msg { font-size: 13px; color: var(--text-primary, #e8e8f8); line-height: 1.6; margin-bottom: 16px; }
 .usp-confirm-btns { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ── Changelog modal ── */
+.chl-modal { width: 500px; max-width: calc(100vw - 40px); }
+.chl-body { padding: 20px 22px; max-height: 60vh; overflow-y: auto; }
+.chl-summary { color: var(--text-secondary, #a0a0c8); font-size: 13px; line-height: 1.6; margin: 0 0 18px; }
+.chl-section { margin-bottom: 18px; }
+.chl-section:last-child { margin-bottom: 0; }
+.chl-section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent, #4f6ef7); margin-bottom: 8px; }
+.chl-list { margin: 0; padding-left: 18px; }
+.chl-list li { font-size: 13px; color: var(--text-primary, #e8e8f8); line-height: 1.6; margin-bottom: 4px; }

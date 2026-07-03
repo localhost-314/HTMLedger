@@ -43,6 +43,7 @@
     tab  = tab  || 'editor';
     wsId = wsId || null;
     _cfg = (await window.api.getSettings()) || {};
+    if (window.api.getAppVersion) _cfg._appVersion = await window.api.getAppVersion();
     // Toolbar theme toggle updates localStorage but not the settings file — sync here
     const lsTheme = localStorage.getItem('htmledger-theme');
     if (lsTheme) _cfg.theme = lsTheme;
@@ -300,12 +301,23 @@
         </label>
         <label class="usp-tog"><input type="checkbox" id="u-au"${au?' checked':''}><span></span></label>
       </div>
+      <div class="usp-row">
+        <label class="usp-lbl">
+          Show release notes after updates
+          <small class="usp-hint">Display what's new the first time you open a new version</small>
+        </label>
+        <label class="usp-tog"><input type="checkbox" id="u-rn"${_cfg.showReleaseNotes !== false?' checked':''}><span></span></label>
+      </div>
+      <div class="usp-row">
+        <label class="usp-lbl">Release notes</label>
+        <button class="usp-chip" id="u-view-rn">View current version</button>
+      </div>
       <div class="usp-divider"></div>
       <div class="usp-about">
         <a class="usp-about-logo" id="ua-logo" href="#">
           <span class="logo-bracket">&lt;</span>HTMLedger<span class="logo-bracket">/&gt;</span>
         </a>
-        <span class="usp-about-ver">v1.0.1</span>
+        <span class="usp-about-ver" id="usp-ver">v${_cfg._appVersion || '…'}</span>
         <a class="usp-about-studio" id="ua-studio" href="#">
           <img src="../assets/localhost314-logo.png" alt="localhost:314">
         </a>
@@ -328,7 +340,12 @@
       _cfg.theme = v;
       _applyTheme(v);
     });
-    _on('#u-au', 'change', e => { _cfg.autoUpdates = e.target.checked; });
+    _on('#u-au', 'change', e => { _cfg.autoUpdates    = e.target.checked; });
+    _on('#u-rn', 'change', e => { _cfg.showReleaseNotes = e.target.checked; });
+    _on('#u-view-rn', 'click', () => {
+      _close();
+      window.api.getAppVersion().then(v => showChangelogModal(v));
+    });
     // Restore-on-launch chips — specific triggers dynamic row
     const rwGroup = _q('#u-rw');
     if (rwGroup) {
@@ -752,3 +769,89 @@
 
   function _close() { if (_overlay) _overlay.style.display = 'none'; }
 })();
+
+/* ── Changelog ─────────────────────────────────────────────────────────── */
+const CHANGELOG = {
+  '2.0.0': {
+    summary: 'Two editors, one install. HTMLedger now ships alongside the all-new Lite edition.',
+    sections: [
+      {
+        title: 'New — HTMLedger Lite',
+        items: [
+          'Ultralight CodeMirror 6 editor — starts in under a second',
+          'Same workspace manager and 11-file-type support as the full edition',
+          'Portable build — runs from a folder with no installer needed',
+        ],
+      },
+      {
+        title: 'Editor',
+        items: [
+          'Markdown preview now renders tables (GFM pipe syntax)',
+          'Preview pane preserves scroll position on every live update',
+          'Tables, blockquotes, and code blocks styled for dark & light themes',
+        ],
+      },
+      {
+        title: 'App',
+        items: [
+          'HTMLedger now appears in Windows "Open with" for all 11 supported file types',
+          'Double-clicking a file opens it directly in the editor, bypassing the workspace picker',
+          'Release notes shown automatically after each update (toggle in Settings → App)',
+        ],
+      },
+    ],
+  },
+};
+
+function showChangelogModal(version) {
+  const log = CHANGELOG[version];
+  const existing = document.getElementById('chl-modal-overlay');
+  if (existing) existing.remove();
+
+  const sectionsHtml = log
+    ? log.sections.map(s => `
+        <div class="chl-section">
+          <div class="chl-section-title">${s.title}</div>
+          <ul class="chl-list">${s.items.map(i => `<li>${i}</li>`).join('')}</ul>
+        </div>`).join('')
+    : '<p style="color:var(--text-muted)">No notes available for this version.</p>';
+
+  const summaryHtml = log?.summary
+    ? `<p class="chl-summary">${log.summary}</p>` : '';
+
+  const el = document.createElement('div');
+  el.id = 'chl-modal-overlay';
+  el.className = 'modal-overlay';
+  el.innerHTML = `
+    <div class="modal chl-modal">
+      <div class="modal-header">
+        <span class="modal-title">What's new in v${version}</span>
+        <button class="modal-close" id="chl-close">&#x2715;</button>
+      </div>
+      <div class="modal-body chl-body">
+        ${summaryHtml}
+        ${sectionsHtml}
+      </div>
+      <div class="modal-footer" style="justify-content:flex-end;gap:0.75rem">
+        <button class="usp-btn-sec" id="chl-disable">Don't show again</button>
+        <button class="usp-btn-pri" id="chl-done">Got it</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+
+  const close = () => el.remove();
+  el.querySelector('#chl-close').onclick = close;
+  el.querySelector('#chl-done').onclick  = close;
+  el.querySelector('#chl-disable').onclick = async () => {
+    const cfg = (await window.api.getSettings()) || {};
+    cfg.showReleaseNotes = false;
+    await window.api.saveSettings(cfg);
+    close();
+  };
+  el.addEventListener('click', e => { if (e.target === el) close(); });
+}
+
+// Listen for the main-process trigger (fires once after an update)
+if (window.api?.onShowChangelog) {
+  window.api.onShowChangelog(version => showChangelogModal(version));
+}
