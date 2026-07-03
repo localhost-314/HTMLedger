@@ -49,6 +49,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     const subjectLine = subject?.trim() || 'General enquiry';
+    const platformTag = body.platform ? `[${body.platform}]` : '[HTMLedger]';
 
     const rsRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -60,8 +61,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         from: 'HTMLedger Contact <contact@email.localhost314.com>',
         to: ['tristanarbet@gmail.com'],
         reply_to: `${name} <${email}>`,
-        subject: `[HTMLedger] ${subjectLine}`,
-        text: `Name: ${name}\nEmail: ${email}\nSubject: ${subjectLine}\n\n${message}`,
+        subject: `${platformTag} ${subjectLine}`,
+        text: `App: ${body.platform || 'Not specified'}\nName: ${name}\nEmail: ${email}\nSubject: ${subjectLine}\n\n${message}`,
       }),
     });
 

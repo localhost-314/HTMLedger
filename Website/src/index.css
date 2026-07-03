@@ -530,6 +530,22 @@ img { max-width: 100%; height: auto; display: block; }
 .form-input:focus, .form-textarea:focus { border-color: var(--accent); }
 .form-textarea { resize: vertical; min-height: 130px; }
 .form-error { font-size: 0.8125rem; color: var(--red); margin-top: 0.4rem; }
+.cf-app-toggle { display: flex; gap: 0.5rem; }
+.cf-app-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.cf-app-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--text-primary); }
+.cf-app-btn--active { border-color: var(--accent); background: rgba(96,165,250,0.1); color: var(--accent); }
+.cf-app-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .form-success {
   background: var(--green-dim);
   border: 1px solid rgba(34,197,94,0.3);
