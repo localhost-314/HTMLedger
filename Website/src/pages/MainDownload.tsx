@@ -45,7 +45,7 @@ export default function MainDownload() {
           </div>
 
           <div className="dl-meta">
-            Windows x64 &nbsp;·&nbsp; ~150 MB &nbsp;·&nbsp; NSIS Installer
+            Windows x64 &nbsp;·&nbsp; NSIS Installer
           </div>
 
           <div className="dl-smartscreen-note">
