@@ -1122,6 +1122,16 @@ function langLabel(tab) {
 }
 
 /* ── Preview ── */
+// Swap the preview iframe src while preserving scroll position.
+// If the new content is shorter the browser clamps scrollTo automatically,
+// which lands the user at the bottom — exactly right when content was deleted.
+function setPreviewSrc(blobUrl) {
+  const frame = document.getElementById('preview-frame');
+  const saved = frame.contentWindow?.scrollY ?? 0;
+  frame.addEventListener('load', () => { frame.contentWindow?.scrollTo(0, saved); }, { once: true });
+  frame.src = blobUrl;
+}
+
 function updatePreview() {
   if (!activeTab) return;
   if (activeTab.isImage) return;
@@ -1147,7 +1157,7 @@ function updatePreview() {
       warnBar.dataset.dismissed = '';
     } else {
       warnBar.style.display = 'none';
-      frame.src = URL.createObjectURL(new Blob([content], { type: 'text/html' }));
+      setPreviewSrc(URL.createObjectURL(new Blob([content], { type: 'text/html' })));
     }
     monacoEditor.layout();
   } else if (lang === 'xml' && isSVG) {
@@ -1156,7 +1166,7 @@ function updatePreview() {
     noPreviewBar.style.display = 'none'; warnBar.style.display = 'none';
     updateDMARCButton('');
     const page = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>html,body{margin:0;padding:16px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 32px)}svg{max-width:100%;max-height:calc(100vh - 32px)}</style></head><body>${monacoEditor.getValue()}</body></html>`;
-    frame.src = URL.createObjectURL(new Blob([page], { type: 'text/html' }));
+    setPreviewSrc(URL.createObjectURL(new Blob([page], { type: 'text/html' })));
     monacoEditor.layout();
   } else if (lang === 'xml') {
     previewSection.style.display = ''; paneResizer.style.display = '';
@@ -1246,7 +1256,7 @@ function renderMarkdownPreview(md) {
     tr:nth-child(even) td{background:${light?'rgba(0,0,0,.02)':'rgba(255,255,255,.03)'}}
     ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:${light?'#b0b0d0':'#3a3a5a'};border-radius:3px}
   </style></head><body>${html}</body></html>`;
-  document.getElementById('preview-frame').src = URL.createObjectURL(new Blob([page], { type: 'text/html' }));
+  setPreviewSrc(URL.createObjectURL(new Blob([page], { type: 'text/html' })));
 }
 
 /* ── DMARC ── */
@@ -1397,8 +1407,7 @@ function renderDMARCPreview(xml) {
     ${recordCards}
     </body></html>`;
 
-    document.getElementById('preview-frame').src =
-      URL.createObjectURL(new Blob([page], { type: 'text/html' }));
+    setPreviewSrc(URL.createObjectURL(new Blob([page], { type: 'text/html' })));
   } catch { renderXMLPreview(xml); }
 }
 
@@ -1413,7 +1422,7 @@ function renderXMLPreview(xml) {
     body{margin:0;padding:16px;background:#0d0d1a;font:13px/1.7 'Cascadia Code',Consolas,monospace;color:#c8c8e8;white-space:pre-wrap;word-break:break-all}
     .xd{color:#a78bfa}.xc{color:#4a4a8a;font-style:italic}.xt{color:#60a5fa}.xa{color:#34d399}.xv{color:#fbbf24}
   </style></head><body>${hi}</body></html>`;
-  document.getElementById('preview-frame').src = URL.createObjectURL(new Blob([page], { type: 'text/html' }));
+  setPreviewSrc(URL.createObjectURL(new Blob([page], { type: 'text/html' })));
 }
 
 /* ── Save ── */
@@ -2266,7 +2275,7 @@ function bindEvents() {
     const bar = document.getElementById('preview-warning-bar');
     bar.dataset.dismissed = '1';
     bar.style.display = 'none';
-    document.getElementById('preview-frame').src = URL.createObjectURL(new Blob([monacoEditor.getValue()], { type: 'text/html' }));
+    setPreviewSrc(URL.createObjectURL(new Blob([monacoEditor.getValue()], { type: 'text/html' })));
   };
   document.getElementById('btn-preview-hide').onclick = () => {
     const bar = document.getElementById('preview-warning-bar');
