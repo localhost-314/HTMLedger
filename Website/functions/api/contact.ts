@@ -25,17 +25,27 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       return Response.json({ success: false, code: 422 }, { status: 422 });
     }
 
-    // Verify Turnstile token if secret key is configured
+    // Verify Turnstile token — non-blocking: ad blockers corrupt tokens, so we log
+    // failures and continue rather than hard-rejecting legitimate users.
     if (env.TURNSTILE_SECRET_KEY && cfToken) {
-      const tsRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ secret: env.TURNSTILE_SECRET_KEY, response: cfToken }),
-      });
-      const tsData = await tsRes.json() as { success: boolean };
-      if (!tsData.success) {
-        return Response.json({ success: false, code: 403 }, { status: 403 });
+      try {
+        const tsRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ secret: env.TURNSTILE_SECRET_KEY, response: cfToken }),
+        });
+        const tsData = await tsRes.json() as { success: boolean };
+        if (!tsData.success) {
+          console.warn('Turnstile verification failed (continuing):', tsData);
+        }
+      } catch (tsErr) {
+        console.warn('Turnstile check error (continuing):', tsErr);
       }
+    }
+
+    if (!env.MAILGUN_API_KEY) {
+      console.error('MAILGUN_API_KEY is not configured');
+      return Response.json({ success: false, code: 503 }, { status: 503 });
     }
 
     const subjectLine = subject?.trim() || 'General enquiry';
