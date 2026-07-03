@@ -43,7 +43,6 @@
     tab  = tab  || 'editor';
     wsId = wsId || null;
     _cfg = (await window.api.getSettings()) || {};
-    if (window.api.getAppVersion) _cfg._appVersion = await window.api.getAppVersion();
     // Toolbar theme toggle updates localStorage but not the settings file — sync here
     const lsTheme = localStorage.getItem('htmledger-theme');
     if (lsTheme) _cfg.theme = lsTheme;
@@ -317,7 +316,7 @@
         <a class="usp-about-logo" id="ua-logo" href="#">
           <span class="logo-bracket">&lt;</span>HTMLedger<span class="logo-bracket">/&gt;</span>
         </a>
-        <span class="usp-about-ver" id="usp-ver">v${_cfg._appVersion || '…'}</span>
+        <span class="usp-about-ver" id="usp-ver">v…</span>
         <a class="usp-about-studio" id="ua-studio" href="#">
           <img src="../assets/localhost314-logo.png" alt="localhost:314">
         </a>
@@ -336,6 +335,14 @@
   }
 
   function _bindApp() {
+    // Fill in the live version — the span is static HTML so we patch it here
+    if (window.api?.getAppVersion) {
+      window.api.getAppVersion().then(v => {
+        const el = _q('#usp-ver');
+        if (el) el.textContent = `v${v}`;
+      });
+    }
+
     _chips('#u-th', v => {
       _cfg.theme = v;
       _applyTheme(v);
