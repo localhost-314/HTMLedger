@@ -26,15 +26,23 @@ function ScrollToTop() {
 export default function App() {
   const [dlOpen, setDlOpen] = useState(false);
   const [dlHint, setDlHint] = useState<'main' | 'lite' | undefined>(undefined);
+  const [dlStartQuiz, setDlStartQuiz] = useState(false);
 
   function openDl(hint?: 'main' | 'lite') {
     setDlHint(hint);
+    setDlStartQuiz(false);
+    setDlOpen(true);
+  }
+
+  function openQuiz() {
+    setDlHint(undefined);
+    setDlStartQuiz(true);
     setDlOpen(true);
   }
 
   return (
     <BrowserRouter>
-      <DownloadProvider onOpen={openDl}>
+      <DownloadProvider onOpen={openDl} onOpenQuiz={openQuiz}>
         <ScrollToTop />
         <Navbar />
         <main>
@@ -57,6 +65,7 @@ export default function App() {
         <DownloadModal
           open={dlOpen}
           hint={dlHint}
+          startQuiz={dlStartQuiz}
           onClose={() => setDlOpen(false)}
         />
       </DownloadProvider>

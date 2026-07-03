@@ -2,6 +2,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react';
 
 type DownloadContextType = {
   open: (hint?: 'main' | 'lite') => void;
+  openQuiz: () => void;
 };
 
 const DownloadContext = createContext<DownloadContextType | null>(null);
@@ -12,11 +13,11 @@ export function useDownloadModal() {
   return ctx;
 }
 
-type Props = { children: ReactNode; onOpen: (hint?: 'main' | 'lite') => void };
+type Props = { children: ReactNode; onOpen: (hint?: 'main' | 'lite') => void; onOpenQuiz: () => void };
 
-export function DownloadProvider({ children, onOpen }: Props) {
+export function DownloadProvider({ children, onOpen, onOpenQuiz }: Props) {
   return (
-    <DownloadContext.Provider value={{ open: onOpen }}>
+    <DownloadContext.Provider value={{ open: onOpen, openQuiz: onOpenQuiz }}>
       {children}
     </DownloadContext.Provider>
   );

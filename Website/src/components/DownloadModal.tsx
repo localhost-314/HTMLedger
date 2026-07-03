@@ -18,9 +18,10 @@ const QUIZ = [
 
 type Mode = 'pick' | 'quiz' | 'result';
 
-export default function DownloadModal({ open, hint, onClose }: {
+export default function DownloadModal({ open, hint, startQuiz, onClose }: {
   open: boolean;
   hint?: 'main' | 'lite';
+  startQuiz?: boolean;
   onClose: () => void;
 }) {
   const navigate = useNavigate();
@@ -29,8 +30,8 @@ export default function DownloadModal({ open, hint, onClose }: {
   const [votes, setVotes] = useState<('lite' | 'main')[]>([]);
 
   useEffect(() => {
-    if (open) { setMode('pick'); setStep(0); setVotes([]); }
-  }, [open]);
+    if (open) { setMode(startQuiz ? 'quiz' : 'pick'); setStep(0); setVotes([]); }
+  }, [open, startQuiz]);
 
   const close = useCallback(() => {
     onClose();

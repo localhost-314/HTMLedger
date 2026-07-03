@@ -42,7 +42,7 @@ function Cell({ val }: { val: boolean | string }) {
 }
 
 export default function Home() {
-  const { open } = useDownloadModal();
+  const { open, openQuiz } = useDownloadModal();
 
   return (
     <>
@@ -120,7 +120,7 @@ export default function Home() {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-            <button className="hub-quiz-cta" onClick={() => open()}>
+            <button className="hub-quiz-cta" onClick={openQuiz}>
               Not sure which is right for you? Take the 1-minute quiz →
             </button>
           </div>
