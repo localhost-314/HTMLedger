@@ -1,3 +1,5 @@
+<img width="256" height="89" alt="Image of HTML Ledger Logo" src="https://github.com/user-attachments/assets/eb79399e-4ea5-4207-b8af-da2663d92334" />
+
 # HTMLedger
 
 **Free HTML editing for Windows. Two editions. Zero compromise.**
@@ -76,6 +78,8 @@ HTMLedger is fully open source — including this repository and the website at 
 ---
 
 ## About
+
+<img width="223" height="36" alt="Local Host 314 Logo" src="https://github.com/user-attachments/assets/2b200ea6-35d3-46f4-879d-6edb67938cf2" />
 
 HTMLedger is developed and maintained by **[Localhost:314](https://localhost314.com)**, a web development company based in St. Louis, Missouri. Localhost:314 creates a range of products — from planning trips and editing HTML files to helping small businesses fulfill orders with advanced online systems.
 
