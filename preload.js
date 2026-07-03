@@ -51,6 +51,10 @@ contextBridge.exposeInMainWorld('api', {
   // "Open with" / double-click file launch
   onOpenFileArgv: (cb) => ipcRenderer.on('open-file-argv', (_e, p) => cb(p)),
 
+  // App version + release notes
+  getAppVersion:    ()       => ipcRenderer.invoke('get-app-version'),
+  onShowChangelog:  (cb)     => ipcRenderer.on('show-changelog', (_e, v) => cb(v)),
+
   // Shell
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
 

@@ -38,12 +38,31 @@ function createWindow() {
 
   mainWindow.loadFile('renderer/home.html');
 
-  // Once the renderer is ready, send the file path so it can open it directly
-  const argFile = getArgvFile();
-  if (argFile) {
-    mainWindow.webContents.once('did-finish-load', () => {
-      mainWindow.webContents.send('open-file-argv', argFile);
-    });
+  mainWindow.webContents.once('did-finish-load', () => {
+    // "Open with" / double-click file launch
+    const argFile = getArgvFile();
+    if (argFile) mainWindow.webContents.send('open-file-argv', argFile);
+
+    // Show release notes if the version changed since last launch
+    checkShowChangelog();
+  });
+}
+
+function checkShowChangelog() {
+  try {
+    const settingsPath = path.join(app.getPath('userData'), 'settings.json');
+    const settings = fs.existsSync(settingsPath)
+      ? JSON.parse(fs.readFileSync(settingsPath, 'utf8'))
+      : {};
+    const current  = app.getVersion();
+    const lastSeen = settings.lastSeenVersion;
+    settings.lastSeenVersion = current;
+    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf8');
+    if (lastSeen && lastSeen !== current && settings.showReleaseNotes !== false) {
+      mainWindow.webContents.send('show-changelog', current);
+    }
+  } catch (err) {
+    console.error('changelog check error:', err);
   }
 }
 
@@ -424,6 +443,8 @@ ipcMain.handle('save-workspaces', async (event, workspaces) => {
 });
 
 // --- Settings ---
+ipcMain.handle('get-app-version', () => app.getVersion());
+
 ipcMain.handle('get-settings', async () => {
   try { return JSON.parse(fs.readFileSync(path.join(app.getPath('userData'), 'settings.json'), 'utf8')); }
   catch { return {}; }
