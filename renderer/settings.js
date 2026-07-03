@@ -779,6 +779,27 @@
 
 /* ── Changelog ─────────────────────────────────────────────────────────── */
 const CHANGELOG = {
+  '2.0.1': {
+    summary: 'Polish and fixes across the editor, preview, and contact form.',
+    sections: [
+      {
+        title: 'Editor',
+        items: [
+          'Markdown preview now renders tables (GFM pipe syntax)',
+          'Preview pane preserves scroll position on every live update — no more jumping to the top',
+        ],
+      },
+      {
+        title: 'App',
+        items: [
+          'HTMLedger now appears in Windows "Open with" for all 11 supported file types',
+          'Double-clicking a supported file opens it directly in the editor',
+          'Settings now shows the correct live app version',
+          'Release notes shown automatically after updates — toggle in Settings → App',
+        ],
+      },
+    ],
+  },
   '2.0.0': {
     summary: 'Two editors, one install. HTMLedger now ships alongside the all-new Lite edition.',
     sections: [
