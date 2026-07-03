@@ -10,6 +10,8 @@ import MainApp from './pages/MainApp';
 import LiteApp from './pages/LiteApp';
 import Features from './pages/Features';
 import Download from './pages/Download';
+import MainDownload from './pages/MainDownload';
+import LiteDownload from './pages/LiteDownload';
 import Contact from './pages/Contact';
 import TOS from './pages/TOS';
 import Privacy from './pages/Privacy';
@@ -40,10 +42,10 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/main" element={<MainApp />} />
             <Route path="/main/features" element={<Features />} />
-            <Route path="/main/download" element={<Download />} />
+            <Route path="/main/download" element={<MainDownload />} />
             <Route path="/lite" element={<LiteApp />} />
             <Route path="/lite/features" element={<LiteApp />} />
-            <Route path="/lite/download" element={<Download />} />
+            <Route path="/lite/download" element={<LiteDownload />} />
             <Route path="/download" element={<Navigate to="/" replace />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/tos" element={<TOS />} />

@@ -96,11 +96,15 @@ export default function Navbar() {
 
           {/* Context-aware CTA */}
           {isLite ? (
-            <button className="btn btn-sm nav-cta" style={{ background: '#818cf8', color: '#fff' }} onClick={() => openDl('lite')}>
+            <Link to="/lite/download" className="btn btn-sm nav-cta" style={{ background: '#818cf8', color: '#fff' }}>
               Get Lite
-            </button>
+            </Link>
+          ) : isMain ? (
+            <Link to="/main/download" className="btn btn-primary btn-sm nav-cta">
+              Download Free
+            </Link>
           ) : (
-            <button className="btn btn-primary btn-sm nav-cta" onClick={() => openDl(isMain ? 'main' : undefined)}>
+            <button className="btn btn-primary btn-sm nav-cta" onClick={() => openDl()}>
               Download Free
             </button>
           )}

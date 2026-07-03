@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-
-const MAIN_URL = 'https://github.com/localhost-314/HTMLedger/releases/latest/download/HTMLedger.Setup.1.0.1.exe';
-const LITE_URL = 'https://github.com/localhost-314/HTMLedger/releases/latest/download/HTMLedger.Lite.Setup.1.0.0.exe';
+import { useNavigate } from 'react-router-dom';
 
 const QUIZ = [
   {
@@ -25,6 +23,7 @@ export default function DownloadModal({ open, hint, onClose }: {
   hint?: 'main' | 'lite';
   onClose: () => void;
 }) {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>('pick');
   const [step, setStep] = useState(0);
   const [votes, setVotes] = useState<('lite' | 'main')[]>([]);
@@ -84,9 +83,9 @@ export default function DownloadModal({ open, hint, onClose }: {
                   <li>✓ Workspace backup &amp; restore</li>
                 </ul>
                 <div className="dlm-card-size">~150 MB · NSIS installer</div>
-                <a href={MAIN_URL} className="btn btn-primary" download onClick={close}>
+                <button className="btn btn-primary" onClick={() => { close(); navigate('/main/download'); }}>
                   ↓ Download HTMLedger
-                </a>
+                </button>
                 <a href="/main" className="dlm-card-learn" onClick={close}>
                   Learn more →
                 </a>
@@ -107,9 +106,9 @@ export default function DownloadModal({ open, hint, onClose }: {
                   <li>✓ All the essentials, nothing wasted</li>
                 </ul>
                 <div className="dlm-card-size">~25 MB · portable or installer</div>
-                <a href={LITE_URL} className="btn dlm-lite-btn" download onClick={close}>
+                <button className="btn dlm-lite-btn" onClick={() => { close(); navigate('/lite/download'); }}>
                   ↓ Download Lite
-                </a>
+                </button>
                 <a href="/lite" className="dlm-card-learn" onClick={close}>
                   Learn more →
                 </a>
@@ -168,15 +167,13 @@ export default function DownloadModal({ open, hint, onClose }: {
               </p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem' }}>
-              <a
-                href={recommendation === 'main' ? MAIN_URL : LITE_URL}
+              <button
                 className={`btn btn-lg${recommendation === 'lite' ? '' : ' btn-primary'}`}
                 style={recommendation === 'lite' ? { background: '#818cf8', color: '#fff' } : undefined}
-                download
-                onClick={close}
+                onClick={() => { close(); navigate(recommendation === 'main' ? '/main/download' : '/lite/download'); }}
               >
                 ↓ Download {recommendation === 'main' ? 'HTMLedger' : 'Lite'} Free
-              </a>
+              </button>
               <button className="dlm-quiz-link" onClick={() => { setMode('pick'); setStep(0); setVotes([]); }}>
                 ← See both versions
               </button>
