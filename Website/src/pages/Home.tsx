@@ -84,6 +84,9 @@ export default function Home() {
                 <button className="btn btn-primary" onClick={() => open('main')}>↓ Download Free</button>
                 <Link to="/main" className="btn btn-ghost">Explore →</Link>
               </div>
+              <a href="https://github.com/localhost-314/HTMLedger" className="hub-card-oss" target="_blank" rel="noopener noreferrer">
+                Fully open source · View code →
+              </a>
             </div>
 
             <div className="hub-vs">VS</div>
@@ -105,6 +108,9 @@ export default function Home() {
                 <button className="btn hub-lite-btn" onClick={() => open('lite')}>↓ Download Lite Free</button>
                 <Link to="/lite" className="btn btn-ghost">Explore →</Link>
               </div>
+              <a href="https://github.com/localhost-314/HTMLedger" className="hub-card-oss hub-card-oss--lite" target="_blank" rel="noopener noreferrer">
+                Fully open source · View code →
+              </a>
             </div>
           </div>
 
