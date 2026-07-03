@@ -879,7 +879,9 @@ function showChangelogModal(version) {
   el.addEventListener('click', e => { if (e.target === el) close(); });
 }
 
-// Listen for the main-process trigger (fires once after an update)
-if (window.api?.onShowChangelog) {
-  window.api.onShowChangelog(version => showChangelogModal(version));
+// Ask main process on load — renderer pulls when ready, no race condition
+if (window.api?.checkChangelog) {
+  window.api.checkChangelog().then(version => {
+    if (version) showChangelogModal(version);
+  });
 }

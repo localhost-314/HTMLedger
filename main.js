@@ -42,13 +42,12 @@ function createWindow() {
     // "Open with" / double-click file launch
     const argFile = getArgvFile();
     if (argFile) mainWindow.webContents.send('open-file-argv', argFile);
-
-    // Small delay so renderer scripts finish registering IPC listeners
-    setTimeout(() => checkShowChangelog(), 800);
   });
 }
 
-function checkShowChangelog() {
+// Renderer calls this when it's ready — returns version string if changelog
+// should be shown, null otherwise. Pull model eliminates the push race condition.
+ipcMain.handle('check-changelog', () => {
   try {
     const settingsPath = path.join(app.getPath('userData'), 'settings.json');
     const settings = fs.existsSync(settingsPath)
@@ -59,12 +58,14 @@ function checkShowChangelog() {
     settings.lastSeenVersion = current;
     fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf8');
     if (lastSeen !== current && settings.showReleaseNotes !== false) {
-      mainWindow.webContents.send('show-changelog', current);
+      return current;
     }
+    return null;
   } catch (err) {
     console.error('changelog check error:', err);
+    return null;
   }
-}
+});
 
 app.whenReady().then(() => {
   createWindow();
