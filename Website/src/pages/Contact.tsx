@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 
-const API = 'https://localhost314.com/api/contact';
+const API = '/api/contact';
 
 declare global {
   interface Window {
