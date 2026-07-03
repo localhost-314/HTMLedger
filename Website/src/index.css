@@ -426,6 +426,10 @@ img { max-width: 100%; height: auto; display: block; }
 .dl-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
 .dl-card p { font-size: 0.875rem; color: var(--text-secondary); }
 
+/* Blip rail — sits right below fixed navbar, then dl-page follows with reduced top pad */
+.dl-blip-rail { padding-top: 4.5rem; }
+.dl-page--has-blip { padding-top: 2.5rem; }
+
 /* Open source blip */
 .dl-opensource-blip {
   display: flex;
