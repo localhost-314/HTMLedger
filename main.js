@@ -58,7 +58,7 @@ function checkShowChangelog() {
     const lastSeen = settings.lastSeenVersion;
     settings.lastSeenVersion = current;
     fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf8');
-    if (lastSeen && lastSeen !== current && settings.showReleaseNotes !== false) {
+    if (lastSeen !== current && settings.showReleaseNotes !== false) {
       mainWindow.webContents.send('show-changelog', current);
     }
   } catch (err) {
