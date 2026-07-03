@@ -21,8 +21,16 @@ interface FormState {
 
 const EMPTY: FormState = { name: '', email: '', subject: '', message: '' };
 
+type AppChoice = 'main' | 'lite' | '';
+
+const APP_OPTIONS: { value: AppChoice; label: string; platform: string }[] = [
+  { value: 'main', label: 'HTMLedger',      platform: 'HTMLedger' },
+  { value: 'lite', label: 'HTMLedger Lite', platform: 'HTMLedger Lite' },
+];
+
 export default function Contact() {
   const [form, setForm]           = useState<FormState>(EMPTY);
+  const [appChoice, setAppChoice] = useState<AppChoice>('');
   const [loading, setLoading]     = useState(false);
   const [success, setSuccess]     = useState(false);
   const [error, setError]         = useState('');
@@ -84,9 +92,10 @@ export default function Contact() {
     setLoading(true);
     setError('');
     try {
+      const chosen = APP_OPTIONS.find(o => o.value === appChoice);
       const payload: Record<string, string> = {
         name: form.name, email: form.email, message: form.message,
-        platform: 'HTMLedger',
+        platform: chosen?.platform ?? 'HTMLedger',
       };
       if (form.subject.trim())  payload.subject = form.subject.trim();
       if (tokenRef.current)     payload.cfToken = tokenRef.current;
@@ -97,6 +106,7 @@ export default function Contact() {
       if (data.success) {
         setSuccess(true);
         setForm(EMPTY);
+        setAppChoice('');
         resetTurnstile();
       } else {
         const code = data.code ?? res.status;
@@ -143,6 +153,25 @@ export default function Contact() {
                 <input id="cf-email" type="email" className="form-input" placeholder="you@example.com"
                   value={form.email} onChange={e => change('email', e.target.value)} disabled={loading} />
               </div>
+              <div className="form-group">
+                <label>
+                  Which app? <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional)</span>
+                </label>
+                <div className="cf-app-toggle">
+                  {APP_OPTIONS.map(o => (
+                    <button
+                      key={o.value}
+                      type="button"
+                      className={`cf-app-btn${appChoice === o.value ? ' cf-app-btn--active' : ''}`}
+                      onClick={() => setAppChoice(prev => prev === o.value ? '' : o.value)}
+                      disabled={loading}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="form-group">
                 <label htmlFor="cf-subject">
                   Subject <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional)</span>
