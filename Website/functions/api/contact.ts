@@ -1,5 +1,5 @@
 interface Env {
-  MAILGUN_API_KEY: string;
+  RESEND_API_KEY: string;
   TURNSTILE_SECRET_KEY?: string;
 }
 
@@ -43,31 +43,30 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       }
     }
 
-    if (!env.MAILGUN_API_KEY) {
-      console.error('MAILGUN_API_KEY is not configured');
+    if (!env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not configured');
       return Response.json({ success: false, code: 503 }, { status: 503 });
     }
 
     const subjectLine = subject?.trim() || 'General enquiry';
 
-    const fd = new FormData();
-    fd.append('from', 'HTMLedger Contact <contact@noreply.localhost314.com>');
-    fd.append('to', 'REDACTED');
-    fd.append('subject', `[HTMLedger] ${subjectLine}`);
-    fd.append('text', `Name: ${name}\nEmail: ${email}\nSubject: ${subjectLine}\n\n${message}`);
-    fd.append('h:Reply-To', `${name} <${email}>`);
+    const rsRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'HTMLedger Contact <contact@noreply.localhost314.com>',
+        to: ['REDACTED'],
+        reply_to: `${name} <${email}>`,
+        subject: `[HTMLedger] ${subjectLine}`,
+        text: `Name: ${name}\nEmail: ${email}\nSubject: ${subjectLine}\n\n${message}`,
+      }),
+    });
 
-    const mgRes = await fetch(
-      'https://api.mailgun.net/v3/noreply.localhost314.com/messages',
-      {
-        method: 'POST',
-        headers: { Authorization: `Basic ${btoa(`api:${env.MAILGUN_API_KEY}`)}` },
-        body: fd,
-      }
-    );
-
-    if (!mgRes.ok) {
-      console.error('Mailgun error:', await mgRes.text());
+    if (!rsRes.ok) {
+      console.error('Resend error:', await rsRes.text());
       return Response.json({ success: false, code: 502 }, { status: 502 });
     }
 
