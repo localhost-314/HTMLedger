@@ -996,6 +996,19 @@ img { max-width: 100%; height: auto; display: block; }
 
 .hub-card-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 
+.hub-card-oss {
+  display: block;
+  margin-top: 0.9rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+  transition: color 0.15s;
+}
+.hub-card-oss:hover { color: var(--accent); }
+.hub-card-oss--lite:hover { color: #818cf8; }
+
 .hub-lite-btn { background: #818cf8; color: #fff; }
 .hub-lite-btn:hover { background: #a5b4fc; }
 
