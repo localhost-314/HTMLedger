@@ -779,6 +779,17 @@
 
 /* ── Changelog ─────────────────────────────────────────────────────────── */
 const CHANGELOG = {
+  '2.0.2': {
+    summary: 'Fixes the release notes not appearing after updating.',
+    sections: [
+      {
+        title: 'Fixed',
+        items: [
+          'Release notes now reliably appear on first launch after an update for all users',
+        ],
+      },
+    ],
+  },
   '2.0.1': {
     summary: 'Polish and fixes across the editor, preview, and contact form.',
     sections: [
