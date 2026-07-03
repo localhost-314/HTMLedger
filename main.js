@@ -43,8 +43,8 @@ function createWindow() {
     const argFile = getArgvFile();
     if (argFile) mainWindow.webContents.send('open-file-argv', argFile);
 
-    // Show release notes if the version changed since last launch
-    checkShowChangelog();
+    // Small delay so renderer scripts finish registering IPC listeners
+    setTimeout(() => checkShowChangelog(), 800);
   });
 }
 
