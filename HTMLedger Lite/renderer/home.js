@@ -345,7 +345,7 @@ document.getElementById('link-tos').onclick      = () => window.api.openExternal
 document.getElementById('link-privacy').onclick  = () => window.api.openExternal(SITE + '/privacy');
 document.getElementById('link-issue').onclick    = () => window.api.openExternal('https://github.com/localhost-314/HTMLedger/issues/new');
 document.getElementById('link-known').onclick    = () => window.api.openExternal('https://github.com/localhost-314/HTMLedger/issues');
-document.getElementById('link-contact').onclick  = () => window.api.openExternal(SITE + '/contactforlite');
+document.getElementById('link-contact').onclick  = () => window.api.openExternal(SITE + '/contact');
 
 // Home has no unsaved state — always allow close immediately
 window.api.onCloseRequested(() => window.api.allowClose());
