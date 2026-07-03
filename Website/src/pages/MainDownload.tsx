@@ -7,14 +7,16 @@ const VERSION = '2.0.0';
 
 export default function MainDownload() {
   return (
-    <div className="dl-page">
-
-      <div className="dl-opensource-blip">
-        <span className="dl-opensource-dot" />
-        HTMLedger and HTMLedger Lite are fully open source — including this website.{' '}
-        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">Browse the code on GitHub →</a>
+    <>
+      <div className="dl-blip-rail">
+        <div className="dl-opensource-blip">
+          <span className="dl-opensource-dot" />
+          HTMLedger and HTMLedger Lite are fully open source — including this website.{' '}
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">Browse the code on GitHub →</a>
+        </div>
       </div>
 
+      <div className="dl-page dl-page--has-blip">
       <div className="container">
         <div className="dl-hero">
           <div className="dl-version-chip">
@@ -130,5 +132,6 @@ export default function MainDownload() {
         </div>
       </div>
     </div>
+    </>
   );
 }

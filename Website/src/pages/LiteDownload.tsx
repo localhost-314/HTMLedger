@@ -8,14 +8,16 @@ const ACCENT = '#818cf8';
 
 export default function LiteDownload() {
   return (
-    <div className="dl-page">
-
-      <div className="dl-opensource-blip dl-opensource-blip--lite">
-        <span className="dl-opensource-dot" style={{ background: ACCENT }} />
-        HTMLedger and HTMLedger Lite are fully open source — including this website.{' '}
-        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">Browse the code on GitHub →</a>
+    <>
+      <div className="dl-blip-rail">
+        <div className="dl-opensource-blip dl-opensource-blip--lite">
+          <span className="dl-opensource-dot" style={{ background: ACCENT }} />
+          HTMLedger and HTMLedger Lite are fully open source — including this website.{' '}
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">Browse the code on GitHub →</a>
+        </div>
       </div>
 
+      <div className="dl-page dl-page--has-blip">
       <div className="container">
         <div className="dl-hero">
           <div className="dl-version-chip" style={{ borderColor: ACCENT + '55', color: ACCENT }}>
@@ -133,5 +135,6 @@ export default function LiteDownload() {
         </div>
       </div>
     </div>
+    </>
   );
 }
