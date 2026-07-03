@@ -103,7 +103,7 @@ export default function Contact() {
         resetTurnstile();
       }
     } catch {
-      setError('Could not reach the server. Email us at htmledger@localhost314.com');
+      setError('Could not reach the server.. Email us at htmledger@localhost314.com');
     } finally {
       setLoading(false);
     }
