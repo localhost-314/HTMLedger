@@ -57,7 +57,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'HTMLedger Contact <contact@noreply.localhost314.com>',
+        from: 'HTMLedger Contact <contact@email.localhost314.com>',
         to: ['tristanarbet@gmail.com'],
         reply_to: `${name} <${email}>`,
         subject: `[HTMLedger] ${subjectLine}`,
