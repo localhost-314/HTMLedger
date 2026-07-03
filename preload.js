@@ -48,6 +48,9 @@ contextBridge.exposeInMainWorld('api', {
   onUpdateDownloaded: (cb) => ipcRenderer.on('update-downloaded', cb),
   installUpdate: () => ipcRenderer.send('install-update'),
 
+  // "Open with" / double-click file launch
+  onOpenFileArgv: (cb) => ipcRenderer.on('open-file-argv', (_e, p) => cb(p)),
+
   // Shell
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
 

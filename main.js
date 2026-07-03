@@ -13,6 +13,13 @@ app.commandLine.appendSwitch('disable-gpu-cache');
 
 let mainWindow;
 
+// File path passed via "Open with" or double-click (argv[1] in packaged app)
+function getArgvFile() {
+  const args = process.argv.slice(app.isPackaged ? 1 : 2);
+  const f = args.find(a => !a.startsWith('-') && /\.(html?|css|jsx?|tsx?|json|xml|svg|md)$/i.test(a));
+  return f || null;
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1280,
@@ -30,6 +37,14 @@ function createWindow() {
   });
 
   mainWindow.loadFile('renderer/home.html');
+
+  // Once the renderer is ready, send the file path so it can open it directly
+  const argFile = getArgvFile();
+  if (argFile) {
+    mainWindow.webContents.once('did-finish-load', () => {
+      mainWindow.webContents.send('open-file-argv', argFile);
+    });
+  }
 }
 
 app.whenReady().then(() => {

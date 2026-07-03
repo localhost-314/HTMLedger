@@ -1216,6 +1216,15 @@ function renderMarkdownPreview(md) {
     .replace(/!\[([^\]]*)\]\(([^)]+)\)/g,'<img alt="$1" src="$2">')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2">$1</a>')
     .replace(/(<li>.*<\/li>\n?)+/g, m=>`<ul>${m}</ul>`)
+    .replace(/(?:^|\n)((?:\|[^\n]+\|\n?)+)/g, (_, block) => {
+      const rows = block.trim().split('\n').map(r => r.trim());
+      const isSep = r => /^\|[\s\-:|]+\|$/.test(r);
+      const cells = r => r.replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+      if (rows.length < 2 || !isSep(rows[1])) return _;
+      const head = cells(rows[0]).map(c=>`<th>${c}</th>`).join('');
+      const body = rows.slice(2).map(r=>`<tr>${cells(r).map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
+      return `\n<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+    })
     .replace(/\n\n([^<])/g,'\n\n<p>$1').replace(/([^>])\n\n/g,'$1</p>\n\n')
     .replace(/([^>\n])\n([^<\n])/g,'$1<br>$2');
   const light = document.documentElement.getAttribute('data-theme') === 'light';
@@ -1231,6 +1240,10 @@ function renderMarkdownPreview(md) {
     pre code{background:none;padding:0}blockquote{border-left:3px solid #4f6ef7;margin:1em 0;padding:.3em 1em;color:${light?'#6060a0':'#8888b0'};background:rgba(79,110,247,.08);border-radius:0 6px 6px 0}
     ul,ol{margin:.6em 0;padding-left:1.6em}li{margin:.2em 0}hr{border:none;border-top:1px solid ${light?'rgba(0,0,0,.1)':'rgba(255,255,255,.08)'};margin:1.5em 0}
     img{max-width:100%;border-radius:6px}
+    table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.9em}
+    th,td{border:1px solid ${light?'rgba(0,0,0,.15)':'rgba(255,255,255,.12)'};padding:6px 12px;text-align:left}
+    th{background:${light?'rgba(0,0,0,.05)':'rgba(255,255,255,.06)'};font-weight:600}
+    tr:nth-child(even) td{background:${light?'rgba(0,0,0,.02)':'rgba(255,255,255,.03)'}}
     ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:${light?'#b0b0d0':'#3a3a5a'};border-radius:3px}
   </style></head><body>${html}</body></html>`;
   document.getElementById('preview-frame').src = URL.createObjectURL(new Blob([page], { type: 'text/html' }));
