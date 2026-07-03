@@ -87,3 +87,7 @@ HTMLedger is developed and maintained by **[Localhost:314](https://localhost314.
 ---
 
 *Free for personal and commercial use · MIT License · Windows 10 & 11 (64-bit)*
+
+---
+
+*Also see other projects by Localhost:314 — [**Globe Itinerary**](https://globeitinerary.com/) — Free and powerful trip itinerary building with AI tools, jet-lag planning, and collaboration. · [**Order Dispatchy**](https://orderdispatchy.com) — Online ordering systems with Kanban-style overview and driver live GPS tracking for small businesses, all without replacing your current driver fleet.*
