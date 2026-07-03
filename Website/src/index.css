@@ -615,7 +615,7 @@ img { max-width: 100%; height: auto; display: block; }
   gap: 0.6rem;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   animation: fadeUp 0.5s 0.25s ease both;
 }
 .trust-pill {
@@ -925,18 +925,26 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 /* ===== Hub Home ===== */
-.hub-hero { padding-bottom: 5rem; }
+.hub-hero { padding-bottom: 3rem; justify-content: flex-start; padding-top: 5.5rem; min-height: auto; }
 .hub-glow { background: radial-gradient(ellipse 90% 60% at 50% -10%, rgba(79,110,247,0.22) 0%, transparent 70%) !important; }
-.hub-hero-inner { position: relative; z-index: 1; }
-
-.hub-cards-section { padding-top: 2rem; }
+.hub-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.hub-hero-title { font-size: clamp(2.4rem, 5.5vw, 4.25rem) !important; margin-bottom: 0.75rem !important; }
+.hub-hero-sub { font-size: 1rem !important; margin-bottom: 1.25rem !important; max-width: 520px !important; }
 
 .hub-cards {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 1.5rem;
-  align-items: center;
+  align-items: start;
 }
+.hub-cards--hero { margin-top: 1.75rem; width: 100%; }
 @media (max-width: 780px) {
   .hub-cards { grid-template-columns: 1fr; }
   .hub-vs { display: none; }
