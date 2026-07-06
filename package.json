@@ -6,7 +6,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win --x64"
+    "build": "electron-builder --win --x64",
+    "build:store": "electron-builder --win --x64 --config.win.target=appx"
   },
   "build": {
     "appId": "com.htmledger.app",
@@ -18,6 +19,14 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "appx": {
+      "identityName": "localhost314.HTMLedger",
+      "publisher": "CN=4F168544-70A7-4A96-864D-CD21272D099F",
+      "publisherDisplayName": "localhost:314",
+      "applicationId": "HTMLedger",
+      "backgroundColor": "#1a1a2e",
+      "showNameOnTiles": true
     },
     "publish": {
       "provider": "github",
