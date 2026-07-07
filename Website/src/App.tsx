@@ -16,12 +16,27 @@ import Contact from './pages/Contact';
 import TOS from './pages/TOS';
 import Privacy from './pages/Privacy';
 import License from './pages/License';
+import About from './pages/About';
 import DirectDownload from './pages/DirectDownload';
+import LiteDirectDownload from './pages/LiteDirectDownload';
 import NotFound from './pages/NotFound';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
+function RouteTheme() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    if (pathname.startsWith('/lite')) {
+      document.body.classList.add('theme-lite');
+    } else {
+      document.body.classList.remove('theme-lite');
+    }
+    return () => document.body.classList.remove('theme-lite');
+  }, [pathname]);
   return null;
 }
 
@@ -46,6 +61,7 @@ export default function App() {
     <BrowserRouter>
       <DownloadProvider onOpen={openDl} onOpenQuiz={openQuiz}>
         <ScrollToTop />
+        <RouteTheme />
         <Navbar />
         <main>
           <Routes>
@@ -61,7 +77,9 @@ export default function App() {
             <Route path="/tos" element={<TOS />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/license" element={<License />} />
+            <Route path="/about" element={<About />} />
             <Route path="/main/download/direct" element={<DirectDownload />} />
+            <Route path="/lite/download/direct" element={<LiteDirectDownload />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

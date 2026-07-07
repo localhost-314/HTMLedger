@@ -25,12 +25,12 @@ export default function License() {
           out of or in connection with the software or the use or other dealings in the
           software.
         </p>
-        <p>
+        <div className="license-source-box">
           The full source code is available on{' '}
           <a href="https://github.com/localhost-314/HTMLedger" target="_blank" rel="noopener noreferrer">
             GitHub
           </a>.
-        </p>
+        </div>
       </div>
     </div>
   );

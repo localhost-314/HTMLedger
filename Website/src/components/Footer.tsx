@@ -13,6 +13,7 @@ export default function Footer() {
           </div>
           <div className="footer-links">
             <Link to="/download" className="footer-link">Download</Link>
+            <Link to="/about" className="footer-link">About</Link>
             <Link to="/contact" className="footer-link">Contact</Link>
             <Link to="/tos" className="footer-link">Terms of Service</Link>
             <Link to="/privacy" className="footer-link">Privacy Policy</Link>

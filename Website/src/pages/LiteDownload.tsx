@@ -1,23 +1,12 @@
 import { Link } from 'react-router-dom';
 
-const LITE_URL = 'https://github.com/localhost-314/HTMLedger/releases/download/v2.0.0-lite/HTMLedger.Lite.Setup.2.0.0.exe';
 const GITHUB_URL = 'https://github.com/localhost-314/HTMLedger';
-const SOURCE_ZIP = 'https://github.com/localhost-314/HTMLedger/archive/refs/tags/v2.0.0-lite.zip';
-const VERSION = '2.0.0';
+const VERSION = '2.0.2';
 const ACCENT = '#818cf8';
 
 export default function LiteDownload() {
   return (
-    <>
-      <div className="dl-blip-rail">
-        <div className="dl-opensource-blip dl-opensource-blip--lite">
-          <span className="dl-opensource-dot" style={{ background: ACCENT }} />
-          HTMLedger and HTMLedger Lite are fully open source — including this website.{' '}
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">Browse the code on GitHub →</a>
-        </div>
-      </div>
-
-      <div className="dl-page dl-page--has-blip">
+      <div className="dl-page">
       <div className="container">
         <div className="dl-hero">
           <div className="dl-version-chip" style={{ borderColor: ACCENT + '55', color: ACCENT }}>
@@ -29,44 +18,26 @@ export default function LiteDownload() {
             Free for Windows 10 and Windows 11. Ultralight, fast startup, no subscription.
           </p>
 
-          <div className="dl-btn-wrap">
-            <a
-              href={LITE_URL}
-              className="btn btn-lg"
-              style={{ background: ACCENT, color: '#fff' }}
-              download
-            >
-              ↓ &nbsp;HTMLedger Lite Setup {VERSION}.exe
-            </a>
-          </div>
-
-          <div className="dl-source-links">
-            <a href={GITHUB_URL} className="dl-github-btn dl-github-btn--lite" target="_blank" rel="noopener noreferrer">
+          <div className="dl-main-btns">
+            <div className="dl-store-coming-soon">
+              <span className="dl-store-coming-icon">🏪</span>
+              <div>
+                <div className="dl-store-coming-title">Microsoft Store</div>
+                <div className="dl-store-coming-sub">Coming soon</div>
+              </div>
+            </div>
+            <a href={GITHUB_URL} className="dl-main-btn-github" target="_blank" rel="noopener noreferrer">
               <img src="/GitHub_Invertocat_White.png" alt="GitHub" className="dl-github-logo" />
               View source code on GitHub
-            </a>
-            <a href={SOURCE_ZIP} className="dl-source-zip" target="_blank" rel="noopener noreferrer">
-              Download source code (zip)
             </a>
           </div>
 
           <div className="dl-meta">
-            Windows x64 &nbsp;·&nbsp; ~260 MB installed &nbsp;·&nbsp; NSIS Installer
+            Windows 10 &amp; 11 Compatible
           </div>
 
-          <div className="dl-smartscreen-note">
-            <strong>Seeing a Windows SmartScreen warning?</strong> This is normal for new apps that
-            haven't yet built a reputation with Microsoft. Click <strong>More info</strong> then{' '}
-            <strong>Run anyway</strong> to proceed. HTMLedger Lite is completely open source —{' '}
-            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">review the full source on GitHub</a>{' '}
-            before installing if you'd like. Still have questions?{' '}
-            <Link to="/contact">Contact us</Link> — we're happy to help.
-          </div>
-
-          <div className="dl-gh-link">
-            <a href="https://github.com/localhost-314/HTMLedger/releases/tag/v2.0.0-lite" target="_blank" rel="noopener noreferrer">
-              View release on GitHub ↗
-            </a>
+          <div className="dl-direct-link">
+            <Link to="/lite/download/direct">Download directly from HTMLedger</Link>
           </div>
         </div>
 
@@ -135,6 +106,5 @@ export default function LiteDownload() {
         </div>
       </div>
     </div>
-    </>
   );
 }

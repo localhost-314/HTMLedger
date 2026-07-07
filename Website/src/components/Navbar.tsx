@@ -44,7 +44,10 @@ export default function Navbar() {
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="container">
         <Link to="/" className="nav-logo">
-          <img src="/Logos/White Wordmark Ledger.png" alt="HTMLedger" />
+          <img
+            src={isLite ? '/Logos/White Wordmark Ledger Lite.png' : '/Logos/White Wordmark Ledger.png'}
+            alt={isLite ? 'HTMLedger Lite' : 'HTMLedger'}
+          />
           <span className="nav-logo-byline">A <a href="https://localhost314.com" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>localhost:314</a> app</span>
         </Link>
 
@@ -93,7 +96,8 @@ export default function Navbar() {
             </DropMenu>
           </div>
 
-          <Link to="/contact" className="nav-link">Contact</Link>
+          <Link to="/about" className={`nav-link ${pathname === '/about' ? 'active' : ''}`}>About</Link>
+          <Link to="/contact" className={`nav-link ${pathname === '/contact' ? 'active' : ''}`}>Contact</Link>
 
           {/* Context-aware CTA */}
           {isLite ? (

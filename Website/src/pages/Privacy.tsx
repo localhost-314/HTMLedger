@@ -2,7 +2,7 @@ export default function Privacy() {
   return (
     <div className="legal-page container">
       <h1>Privacy Policy</h1>
-      <p className="legal-meta">Effective date: June 24, 2026 · localhost314.com / HTMLedger</p>
+      <p className="legal-meta">Effective date: June 24, 2026 · localhost314.com / HTMLedger · Maintained by Tristan A.</p>
 
       <h2>1. Overview</h2>
       <p>
@@ -80,10 +80,17 @@ export default function Privacy() {
       </p>
 
       <h2>10. Contact</h2>
+      <p>Questions about this Privacy Policy? Contact us at:</p>
+      <ul>
+        <li>Our online <a href="/contact">contact form</a></li>
+        <li>Email <a href="mailto:htmledger@localhost314.com">htmledger@localhost314.com</a></li>
+      </ul>
       <p>
-        Privacy questions? <a href="/contact">Contact us</a> or email{' '}
-        <a href="mailto:htmledger@localhost314.com">htmledger@localhost314.com</a>.
+        Need a mailing address? Please email us at{' '}
+        <a href="mailto:addressrequests@localhost314.com">addressrequests@localhost314.com</a> and
+        we will provide it on request.
       </p>
+      <p>Thank you.</p>
     </div>
   );
 }
