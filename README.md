@@ -4,9 +4,9 @@
 
 **Free HTML editing for Windows. Two editions. Zero compromise.**
 
-HTMLedger is a desktop HTML editor built for people who work with HTML files every day — writers, developers, email designers, and small business owners alike. It comes in two editions so you can pick exactly what you need, nothing more.
+HTMLedger is a desktop HTML editor built for people who work with HTML files every day: writers, developers, email designers, and small business owners alike. It comes in two editions so you can pick exactly what you need, nothing more.
 
-[**Download HTMLedger →**](https://github.com/localhost-314/HTMLedger/releases/download/v2.0.0/HTMLedger.Setup.2.0.0.exe) &nbsp;·&nbsp; [**Download Lite →**](https://github.com/localhost-314/HTMLedger/releases/download/v2.0.0-lite/HTMLedger.Lite.Setup.2.0.0.exe) &nbsp;·&nbsp; [**Website →**](https://htmledger.localhost314.com)
+[**Download HTMLedger →**](https://htmledger.localhost314.com/main/download) &nbsp;·&nbsp; [**Download Lite →**](https://htmledger.localhost314.com/lite/download) &nbsp;·&nbsp; [**Website →**](https://htmledger.localhost314.com)
 
 ---
 
@@ -42,8 +42,12 @@ The full-featured edition powered by Monaco — the same editor engine that driv
 - **Workspace manager** — card grid view with search, sort, and rename. Back up and restore any workspace on a schedule you set
 - **File watcher** — get notified when a file changes on disk while you're editing
 - **Settings panel** — font family, font size, tab size, autosave, minimap, and more
+  
+<a href="https://apps.microsoft.com/detail/9P2G56KQTJDB?referrer=appbadge&mode=full" target="_blank"  rel="noopener noreferrer">
+	<img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
+</a>
 
-[Download HTMLedger v2.0.0](https://github.com/localhost-314/HTMLedger/releases/download/v2.0.0/HTMLedger.Setup.2.0.0.exe) · [View all features](https://htmledger.localhost314.com/main)
+[Download HTMLedger Directly From Us →](https://htmledger.localhost314.com/main/download/direct) · [View all features](https://htmledger.localhost314.com/main)
 
 ---
 
@@ -59,7 +63,7 @@ The ultralight edition built on CodeMirror 6. Fast to open, small to ship, and f
 - **Portable build** — runs directly from a folder, no installer or admin rights needed
 - **Settings panel** — font size, tab size, and theme
 
-[Download HTMLedger Lite v2.0.0](https://github.com/localhost-314/HTMLedger/releases/download/v2.0.0-lite/HTMLedger.Lite.Setup.2.0.0.exe) · [Learn more](https://htmledger.localhost314.com/lite)
+[Download HTMLedger Lite](http://localhost:5173/lite/download) · [Learn more](https://htmledger.localhost314.com/lite)
 
 ---
 
@@ -81,7 +85,7 @@ HTMLedger is fully open source — including this repository and the website at 
 
 <img width="223" height="36" alt="Local Host 314 Logo" src="https://github.com/user-attachments/assets/2b200ea6-35d3-46f4-879d-6edb67938cf2" />
 
-HTMLedger is developed and maintained by **[Localhost:314](https://localhost314.com)**, a web development company based in St. Louis, Missouri. Localhost:314 creates a range of products — from planning trips and editing HTML files to helping small businesses fulfill orders with advanced online systems.
+HTMLedger is developed and maintained by **[Localhost:314](https://localhost314.com)**, a web development company based in St. Louis, Missouri. Localhost:314 creates a range of products: from planning trips and editing HTML files to helping small businesses fulfill orders with advanced online systems.
 
 - 🌐 [htmledger.localhost314.com](https://htmledger.localhost314.com)
 - 🏢 [localhost314.com](https://localhost314.com)
