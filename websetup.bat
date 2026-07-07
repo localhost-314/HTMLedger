@@ -68,6 +68,7 @@ echo.
 git remote set-url origin https://github.com/localhost-314/HTMLedger.git
 git add .
 git commit -m "%MSG%"
+git pull --rebase origin main
 git push origin main
 if %errorlevel% neq 0 (
     echo.
@@ -110,6 +111,7 @@ echo.
 git remote set-url origin https://github.com/localhost-314/HTMLedger.git
 git add .
 git commit -m "%MSG%"
+git pull --rebase origin main
 git push origin main
 if %errorlevel% neq 0 (
     echo.

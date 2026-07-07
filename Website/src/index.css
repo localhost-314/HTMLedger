@@ -766,6 +766,26 @@ img { max-width: 100%; height: auto; display: block; }
   letter-spacing: 0.01em;
 }
 
+.trust-pill--store {
+  color: #60a5fa;
+  border-color: rgba(96,165,250,0.3);
+  background: rgba(96,165,250,0.08);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.trust-pill--store:hover {
+  background: rgba(96,165,250,0.15);
+  border-color: rgba(96,165,250,0.5);
+}
+.hub-card-btns--store {
+  align-items: center;
+}
+.hub-store-badge {
+  width: 180px;
+  height: auto;
+  display: block;
+}
+
 /* ===== Dispatchy-style hero stats ===== */
 .hsd-stats {
   display: flex;
@@ -1112,6 +1132,7 @@ img { max-width: 100%; height: auto; display: block; }
 }
 .hub-card-badge--lite { color: #818cf8; background: rgba(129,140,248,0.12); }
 .hub-card-name { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; }
+.hub-card-name--sm { font-size: 1.15rem; }
 .hub-card-engine { font-size: 0.8125rem; color: var(--text-secondary); }
 
 .hub-card-list {

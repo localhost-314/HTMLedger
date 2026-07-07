@@ -51,7 +51,6 @@ export default function Home() {
         <div className="hero-bg-glow hub-glow" />
         <div className="hero-bg-grid" />
         <div className="hub-hero-inner">
-          <div className="hero-tag">HTMLedger</div>
           <h1 className="hero-title hub-hero-title">
             Two editors.<br />Both free.
           </h1>
@@ -70,7 +69,7 @@ export default function Home() {
             <div className="hub-card">
               <div className="hub-card-header">
                 <span className="hub-card-badge">Full Edition</span>
-                <h2 className="hub-card-name">HTMLedger</h2>
+                <h2 className="hub-card-name hub-card-name--sm">HTMLedger</h2>
                 <p className="hub-card-engine">Monaco · the engine behind VS Code</p>
               </div>
               <ul className="hub-card-list">
@@ -80,8 +79,14 @@ export default function Home() {
                 <li><span className="hub-check">✓</span> Workspace backup &amp; restore</li>
                 <li><span className="hub-check">✓</span> Full Monaco — Emmet, minimap, format</li>
               </ul>
-              <div className="hub-card-btns">
-                <button className="btn btn-primary" onClick={() => open('main')}>↓ Download Free</button>
+              <div className="hub-card-btns hub-card-btns--store">
+                <a
+                  href="https://apps.microsoft.com/detail/9P2G56KQTJDB?referrer=appbadge&mode=full"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img src="https://get.microsoft.com/images/en-us%20dark.svg" alt="Get it from Microsoft" className="hub-store-badge" />
+                </a>
                 <Link to="/main" className="btn btn-ghost">Explore →</Link>
               </div>
               <a href="https://github.com/localhost-314/HTMLedger" className="hub-card-oss" target="_blank" rel="noopener noreferrer">
@@ -94,7 +99,7 @@ export default function Home() {
             <div className="hub-card hub-card--lite">
               <div className="hub-card-header">
                 <span className="hub-card-badge hub-card-badge--lite">Lite Edition</span>
-                <h2 className="hub-card-name">HTMLedger Lite</h2>
+                <h2 className="hub-card-name hub-card-name--sm">HTMLedger Lite</h2>
                 <p className="hub-card-engine">CodeMirror 6 · ultralight &amp; fast</p>
               </div>
               <ul className="hub-card-list">
