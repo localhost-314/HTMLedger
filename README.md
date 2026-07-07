@@ -63,7 +63,7 @@ The ultralight edition built on CodeMirror 6. Fast to open, small to ship, and f
 - **Portable build** — runs directly from a folder, no installer or admin rights needed
 - **Settings panel** — font size, tab size, and theme
 
-[Download HTMLedger Lite](http://localhost:5173/lite/download) · [Learn more](https://htmledger.localhost314.com/lite)
+[Download HTMLedger Lite](https://htmledger.localhost314.com/lite/download) · [Learn more](https://htmledger.localhost314.com/lite)
 
 ---
 
