@@ -45,6 +45,7 @@ export default function Navbar() {
       <div className="container">
         <Link to="/" className="nav-logo">
           <img src="/Logos/White Wordmark Ledger.png" alt="HTMLedger" />
+          <span className="nav-logo-byline">A <a href="https://localhost314.com" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>localhost:314</a> app</span>
         </Link>
 
         <div className="nav-links">

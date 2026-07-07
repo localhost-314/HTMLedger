@@ -15,6 +15,8 @@ import LiteDownload from './pages/LiteDownload';
 import Contact from './pages/Contact';
 import TOS from './pages/TOS';
 import Privacy from './pages/Privacy';
+import License from './pages/License';
+import DirectDownload from './pages/DirectDownload';
 import NotFound from './pages/NotFound';
 
 function ScrollToTop() {
@@ -58,6 +60,8 @@ export default function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/tos" element={<TOS />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/license" element={<License />} />
+            <Route path="/main/download/direct" element={<DirectDownload />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

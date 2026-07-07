@@ -206,8 +206,11 @@ img { max-width: 100%; height: auto; display: block; }
   gap: 2rem;
   width: 100%;
 }
-.nav-logo { display: flex; align-items: center; gap: 0.5rem; }
+.nav-logo { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
 .nav-logo img { height: 28px; width: auto; }
+.nav-logo-byline { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.01em; line-height: 1; }
+.nav-logo-byline a { color: var(--text-secondary); text-decoration: underline; text-decoration-color: rgba(255,255,255,0.15); text-underline-offset: 2px; }
+.nav-logo-byline a:hover { color: var(--accent); text-decoration-color: var(--accent); }
 .nav-logo-text {
   font-size: 1rem;
   font-weight: 700;
@@ -558,6 +561,121 @@ img { max-width: 100%; height: auto; display: block; }
 .contact-watermark { margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted); text-align: right; }
 .contact-watermark a { color: var(--text-muted); text-decoration: none; }
 .contact-watermark a:hover { text-decoration: underline; }
+
+/* ===== Store badge + direct download ===== */
+.dl-main-btns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0.5rem;
+}
+.dl-main-btn-store {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 260px;
+}
+.dl-main-btn-store img {
+  width: 100%;
+  height: auto;
+}
+.dl-main-btn-github {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 260px;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: border-color 0.15s, background 0.15s;
+}
+.dl-main-btn-github:hover {
+  background: var(--bg-surface);
+  border-color: var(--border-accent);
+}
+.dl-main-btn-github .dl-github-logo {
+  width: 20px;
+  height: 20px;
+}
+.dl-direct-link {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+.dl-direct-link a {
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+.dl-direct-link a:hover { color: var(--text-secondary); }
+
+/* Direct download warning modal */
+.direct-dl-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+.direct-dl-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+}
+.direct-dl-modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+.direct-dl-modal-body {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+}
+.direct-dl-modal-badge {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.direct-dl-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+.direct-dl-store-nudge {
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  background: var(--accent-dim);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.direct-dl-store-nudge p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+.direct-dl-store-link {
+  font-size: 0.875rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+.direct-dl-store-link:hover { color: var(--accent-hover); }
 
 /* ===== Legal pages ===== */
 .legal-page { padding-top: 8rem; padding-bottom: 6rem; max-width: 760px; margin: 0 auto; }

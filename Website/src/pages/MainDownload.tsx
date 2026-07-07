@@ -1,22 +1,11 @@
 import { Link } from 'react-router-dom';
 
-const MAIN_URL = 'https://github.com/localhost-314/HTMLedger/releases/download/v2.0.0/HTMLedger.Setup.2.0.0.exe';
 const GITHUB_URL = 'https://github.com/localhost-314/HTMLedger';
-const SOURCE_ZIP = 'https://github.com/localhost-314/HTMLedger/archive/refs/tags/v2.0.0.zip';
-const VERSION = '2.0.0';
+const VERSION = '2.0.2';
 
 export default function MainDownload() {
   return (
-    <>
-      <div className="dl-blip-rail">
-        <div className="dl-opensource-blip">
-          <span className="dl-opensource-dot" />
-          HTMLedger and HTMLedger Lite are fully open source — including this website.{' '}
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">Browse the code on GitHub →</a>
-        </div>
-      </div>
-
-      <div className="dl-page dl-page--has-blip">
+      <div className="dl-page">
       <div className="container">
         <div className="dl-hero">
           <div className="dl-version-chip">
@@ -25,42 +14,30 @@ export default function MainDownload() {
           </div>
           <h1 className="dl-title">Download HTMLedger</h1>
           <p className="dl-sub">
-            Free for Windows 10 and Windows 11. One installer, no subscription, no account.
+            Free for Windows 10 and Windows 11. No subscription, no account.
           </p>
 
-          <div className="dl-btn-wrap">
-            <a href={MAIN_URL} className="btn btn-primary btn-lg" download>
-              ↓ &nbsp;HTMLedger Setup {VERSION}.exe
+          <div className="dl-main-btns">
+            <a
+              href="https://apps.microsoft.com/detail/9P2G56KQTJDB?referrer=appbadge&mode=full"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="dl-main-btn-store"
+            >
+              <img src="https://get.microsoft.com/images/en-us%20dark.svg" alt="Get it from Microsoft" />
             </a>
-          </div>
-
-          <div className="dl-source-links">
-            <a href={GITHUB_URL} className="dl-github-btn" target="_blank" rel="noopener noreferrer">
+            <a href={GITHUB_URL} className="dl-main-btn-github" target="_blank" rel="noopener noreferrer">
               <img src="/GitHub_Invertocat_White.png" alt="GitHub" className="dl-github-logo" />
               View source code on GitHub
-            </a>
-            <a href={SOURCE_ZIP} className="dl-source-zip" target="_blank" rel="noopener noreferrer">
-              Download source code (zip)
             </a>
           </div>
 
           <div className="dl-meta">
-            Windows x64 &nbsp;·&nbsp; NSIS Installer
+            Windows 10 &amp; 11 Compatible
           </div>
 
-          <div className="dl-smartscreen-note">
-            <strong>Seeing a Windows SmartScreen warning?</strong> This is normal for new apps that
-            haven't yet built a reputation with Microsoft. Click <strong>More info</strong> then{' '}
-            <strong>Run anyway</strong> to proceed. HTMLedger is completely open source —{' '}
-            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">review the full source on GitHub</a>{' '}
-            before installing if you'd like. Still have questions?{' '}
-            <Link to="/contact">Contact us</Link> — we're happy to help.
-          </div>
-
-          <div className="dl-gh-link">
-            <a href="https://github.com/localhost-314/HTMLedger/releases/tag/v2.0.0" target="_blank" rel="noopener noreferrer">
-              View release on GitHub ↗
-            </a>
+          <div className="dl-direct-link">
+            <Link to="/main/download/direct">Download directly from HTMLedger</Link>
           </div>
         </div>
 
@@ -132,6 +109,5 @@ export default function MainDownload() {
         </div>
       </div>
     </div>
-    </>
   );
 }
