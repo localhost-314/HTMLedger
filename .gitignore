@@ -6,3 +6,4 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 HTMLedger Lite/renderer/cm-bundle.js
+*.bat
