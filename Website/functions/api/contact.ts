@@ -1,6 +1,7 @@
 interface Env {
   RESEND_API_KEY: string;
   TURNSTILE_SECRET_KEY?: string;
+  CONTACT_TO_EMAIL: string;
 }
 
 interface ContactBody {
@@ -59,7 +60,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       },
       body: JSON.stringify({
         from: 'HTMLedger Contact <contact@email.localhost314.com>',
-        to: ['REDACTED'],
+        to: [env.CONTACT_TO_EMAIL],
         reply_to: `${name} <${email}>`,
         subject: `${platformTag} ${subjectLine}`,
         text: `App: ${body.platform || 'Not specified'}\nName: ${name}\nEmail: ${email}\nSubject: ${subjectLine}\n\n${message}`,
