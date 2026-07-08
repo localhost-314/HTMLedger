@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import DummyEditorWidget from '../widgets/DummyEditorWidget';
 import ScreenshotGallery, { type GalleryCategory } from '../components/ScreenshotGallery';
-import { useDownloadModal } from '../contexts/DownloadContext';
 
 const GALLERY: GalleryCategory[] = [
   {
@@ -70,7 +69,6 @@ const LITE_FAQS = [
 ];
 
 export default function LiteApp() {
-  const { open } = useDownloadModal();
   return (
     <>
       {/* ===== Hero ===== */}
@@ -96,9 +94,9 @@ export default function LiteApp() {
           </div>
 
           <div className="hero-btns">
-            <button className="btn btn-lg" style={{ background: '#818cf8', color: '#fff' }} onClick={() => open('lite')}>
+            <Link to="/lite/download" className="btn btn-lg" style={{ background: '#818cf8', color: '#fff' }}>
               ↓&nbsp;&nbsp;Download Lite
-            </button>
+            </Link>
             <Link to="/main" className="btn btn-ghost btn-lg">
               Compare to Full →
             </Link>
@@ -222,9 +220,9 @@ export default function LiteApp() {
             No subscription. No telemetry. No catch.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="btn btn-lg" style={{ background: '#818cf8', color: '#fff' }} onClick={() => open('lite')}>
+            <Link to="/lite/download" className="btn btn-lg" style={{ background: '#818cf8', color: '#fff' }}>
               ↓&nbsp;&nbsp;Download Lite Free
-            </button>
+            </Link>
             <Link to="/main" className="btn btn-ghost btn-lg">
               See Full HTMLedger →
             </Link>

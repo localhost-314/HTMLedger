@@ -3,7 +3,6 @@ import EditorWidget from '../widgets/EditorWidget';
 import SnippetWidget from '../widgets/SnippetWidget';
 import WorkspaceWidget from '../widgets/WorkspaceWidget';
 import ScreenshotGallery, { type GalleryCategory } from '../components/ScreenshotGallery';
-import { useDownloadModal } from '../contexts/DownloadContext';
 
 const GALLERY: GalleryCategory[] = [
   {
@@ -115,7 +114,6 @@ const FAQS = [
 ];
 
 export default function MainApp() {
-  const { open } = useDownloadModal();
   return (
     <>
       {/* ===== Hero ===== */}
@@ -139,9 +137,9 @@ export default function MainApp() {
           </div>
 
           <div className="hero-btns">
-            <button className="btn btn-primary btn-lg" onClick={() => open('main')}>
+            <Link to="/main/download" className="btn btn-primary btn-lg">
               ↓&nbsp;&nbsp;Download Free
-            </button>
+            </Link>
             <a href="#features" className="btn btn-ghost btn-lg">
               See Features
             </a>
@@ -301,9 +299,9 @@ export default function MainApp() {
             No subscription. No signup. No telemetry. No catch.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary btn-lg" onClick={() => open('main')}>
+            <Link to="/main/download" className="btn btn-primary btn-lg">
               ↓&nbsp;&nbsp;Download Free
-            </button>
+            </Link>
             <Link to="/lite" className="btn btn-ghost btn-lg">
               Try HTMLedger Lite →
             </Link>

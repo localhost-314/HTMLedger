@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { useDownloadModal } from '../contexts/DownloadContext';
 
 const SECTIONS = [
   {
@@ -133,8 +132,6 @@ const SECTIONS = [
 ];
 
 export default function Features() {
-  const { open } = useDownloadModal();
-
   return (
     <>
       {/* Hero */}
@@ -150,9 +147,9 @@ export default function Features() {
             A full breakdown of every feature — organized by category.
           </p>
           <div className="hero-btns">
-            <button className="btn btn-primary btn-lg" onClick={() => open('main')}>
+            <Link to="/main/download" className="btn btn-primary btn-lg">
               ↓&nbsp;&nbsp;Download Free
-            </button>
+            </Link>
             <Link to="/lite/features" className="btn btn-ghost btn-lg">
               See Lite instead →
             </Link>
@@ -192,9 +189,9 @@ export default function Features() {
           <h2>Everything above, for free.</h2>
           <p>No subscription. No signup. No telemetry. Download and start editing.</p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary btn-lg" onClick={() => open('main')}>
+            <Link to="/main/download" className="btn btn-primary btn-lg">
               ↓&nbsp;&nbsp;Download HTMLedger Free
-            </button>
+            </Link>
             <Link to="/lite" className="btn btn-ghost btn-lg">
               See HTMLedger Lite →
             </Link>

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import './index.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import SiteBanner from './components/SiteBanner';
 import DownloadModal from './components/DownloadModal';
 import { DownloadProvider } from './contexts/DownloadContext';
 import Home from './pages/Home';
@@ -17,6 +18,9 @@ import TOS from './pages/TOS';
 import Privacy from './pages/Privacy';
 import License from './pages/License';
 import About from './pages/About';
+import Admin from './pages/Admin';
+import Articles from './pages/Articles';
+import Article from './pages/Article';
 import DirectDownload from './pages/DirectDownload';
 import LiteDirectDownload from './pages/LiteDirectDownload';
 import NotFound from './pages/NotFound';
@@ -62,6 +66,7 @@ export default function App() {
       <DownloadProvider onOpen={openDl} onOpenQuiz={openQuiz}>
         <ScrollToTop />
         <RouteTheme />
+        <SiteBanner />
         <Navbar />
         <main>
           <Routes>
@@ -78,6 +83,9 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/license" element={<License />} />
             <Route path="/about" element={<About />} />
+            <Route path="/articles" element={<Articles />} />
+            <Route path="/articles/:slug" element={<Article />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/main/download/direct" element={<DirectDownload />} />
             <Route path="/lite/download/direct" element={<LiteDirectDownload />} />
             <Route path="*" element={<NotFound />} />

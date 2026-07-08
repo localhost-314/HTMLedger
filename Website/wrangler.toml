@@ -1,2 +1,11 @@
 name = "htmlledger"
 pages_build_output_dir = "dist"
+
+[[kv_namespaces]]
+binding = "BANNERS"
+id = "d8debc09323b4c45aa50c654f6e3b852"
+
+[[d1_databases]]
+binding = "CMS"
+database_name = "htmledger-cms"
+database_id = "d7c13128-3930-4b91-b5cb-340e3724a053"

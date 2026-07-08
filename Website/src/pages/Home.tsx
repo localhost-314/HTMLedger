@@ -110,7 +110,7 @@ export default function Home() {
                 <li><span className="hub-check hub-check--lite">✓</span> Portable build — no install needed</li>
               </ul>
               <div className="hub-card-btns">
-                <button className="btn hub-lite-btn" onClick={() => open('lite')}>↓ Download Lite Free</button>
+                <Link to="/lite/download" className="btn hub-lite-btn">↓ Download Lite Free</Link>
                 <Link to="/lite" className="btn btn-ghost">Explore →</Link>
               </div>
               <a href="https://github.com/localhost-314/HTMLedger" className="hub-card-oss hub-card-oss--lite" target="_blank" rel="noopener noreferrer">
@@ -211,9 +211,9 @@ export default function Home() {
               <Link to="/main/features" className="btn btn-primary">
                 See all features →
               </Link>
-              <button className="btn btn-ghost" onClick={() => open('main')}>
+              <Link to="/main/download" className="btn btn-ghost">
                 ↓ Download Free
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -289,9 +289,9 @@ export default function Home() {
               <Link to="/lite" className="btn btn-lg" style={{ background: '#818cf8', color: '#fff' }}>
                 Explore Lite →
               </Link>
-              <button className="btn btn-ghost" onClick={() => open('lite')}>
+              <Link to="/lite/download" className="btn btn-ghost">
                 ↓ Download Lite Free
-              </button>
+              </Link>
             </div>
           </div>
 
