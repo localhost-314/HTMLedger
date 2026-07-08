@@ -11,10 +11,10 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
 
 export const onRequestPut: PagesFunction<Env> = async ({ request, env, params }) => {
   if (!authed(request, env)) return unauthorized();
-  const { slug, title, summary, body, style, published } = await request.json() as Record<string, string>;
+  const { slug, title, summary, body, style, pinned, archived, archived_at, archive_reason, published } = await request.json() as Record<string, string>;
   await env.CMS.prepare(
-    'UPDATE articles SET slug=?, title=?, summary=?, body=?, style=?, published=?, updated_at=datetime(\'now\') WHERE id=?'
-  ).bind(slug, title, summary ?? '', body, style ?? 'plain', published ? 1 : 0, params.id).run();
+    'UPDATE articles SET slug=?, title=?, summary=?, body=?, style=?, pinned=?, archived=?, archived_at=?, archive_reason=?, published=?, updated_at=datetime(\'now\') WHERE id=?'
+  ).bind(slug, title, summary ?? '', body, style ?? 'plain', pinned ? 1 : 0, archived ? 1 : 0, archived_at ?? null, archive_reason ?? null, published ? 1 : 0, params.id).run();
   return Response.json({ ok: true });
 };
 

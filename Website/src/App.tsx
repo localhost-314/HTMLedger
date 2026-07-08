@@ -21,6 +21,7 @@ import About from './pages/About';
 import Admin from './pages/Admin';
 import Articles from './pages/Articles';
 import Article from './pages/Article';
+import ArchivedArticles from './pages/ArchivedArticles';
 import DirectDownload from './pages/DirectDownload';
 import LiteDirectDownload from './pages/LiteDirectDownload';
 import NotFound from './pages/NotFound';
@@ -73,6 +74,8 @@ function AppShell({ dlOpen, dlHint, dlStartQuiz, openDl, openQuiz, onClose }: {
           <Route path="/license" element={<License />} />
           <Route path="/about" element={<About />} />
           <Route path="/articles" element={<Articles />} />
+          <Route path="/articles/archives" element={<ArchivedArticles />} />
+          <Route path="/articles/archives/:slug" element={<Article archived />} />
           <Route path="/articles/:slug" element={<Article />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/main/download/direct" element={<DirectDownload />} />

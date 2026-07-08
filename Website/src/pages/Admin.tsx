@@ -1,6 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-interface Article { id: number; slug: string; title: string; summary: string; style: 'plain' | 'markdown'; published: number; created_at: string; }
+interface Article {
+  id: number; slug: string; title: string; summary: string;
+  style: 'plain' | 'markdown'; pinned: number; archived: number;
+  archived_at: string | null; archive_reason: string | null;
+  published: number; created_at: string;
+}
 interface Banner { message: string; type: 'info' | 'warning' | 'success'; linkUrl?: string; linkText?: string; }
 
 const TOKEN_KEY = 'admin-token';
@@ -25,43 +30,39 @@ export default function Admin() {
   const [editing, setEditing] = useState<Partial<Article> & { body?: string } | null>(null);
   const [isNew, setIsNew] = useState(false);
 
+  // Archive modal state
+  const [archiving, setArchiving] = useState<Article | null>(null);
+  const [archiveReason, setArchiveReason] = useState('');
+
+  // Image upload
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedUrl, setUploadedUrl] = useState('');
+
   async function login() {
     const res = await fetch('/api/admin/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: pwInput }),
     });
-    if (res.ok) {
-      sessionStorage.setItem(TOKEN_KEY, pwInput);
-      setToken(pwInput);
-      setLoginErr(false);
-    } else {
-      setLoginErr(true);
-    }
+    if (res.ok) { sessionStorage.setItem(TOKEN_KEY, pwInput); setToken(pwInput); setLoginErr(false); }
+    else setLoginErr(true);
   }
 
   async function loadBanner() {
     const res = await fetch('/api/admin/banner', { headers: authHeaders(token) });
     const data: Banner | null = await res.json();
-    if (data) { setBanner(data); setBannerActive(true); }
-    else setBannerActive(false);
+    if (data) { setBanner(data); setBannerActive(true); } else setBannerActive(false);
   }
 
   async function saveBanner() {
-    await fetch('/api/admin/banner', {
-      method: 'POST',
-      headers: authHeaders(token),
-      body: JSON.stringify(banner),
-    });
-    setBannerActive(true);
-    setBannerSaved(true);
-    setTimeout(() => setBannerSaved(false), 2000);
+    await fetch('/api/admin/banner', { method: 'POST', headers: authHeaders(token), body: JSON.stringify(banner) });
+    setBannerActive(true); setBannerSaved(true); setTimeout(() => setBannerSaved(false), 2000);
   }
 
   async function clearBanner() {
     await fetch('/api/admin/banner', { method: 'DELETE', headers: authHeaders(token) });
-    setBanner({ message: '', type: 'info' });
-    setBannerActive(false);
+    setBanner({ message: '', type: 'info' }); setBannerActive(false);
   }
 
   async function loadArticles() {
@@ -80,9 +81,37 @@ export default function Admin() {
 
   async function togglePublish(a: Article) {
     await fetch(`/api/admin/articles/${a.id}`, {
-      method: 'PUT',
-      headers: authHeaders(token),
+      method: 'PUT', headers: authHeaders(token),
       body: JSON.stringify({ ...a, published: a.published ? 0 : 1 }),
+    });
+    loadArticles();
+  }
+
+  async function togglePin(a: Article) {
+    await fetch(`/api/admin/articles/${a.id}`, {
+      method: 'PUT', headers: authHeaders(token),
+      body: JSON.stringify({ ...a, pinned: a.pinned ? 0 : 1 }),
+    });
+    loadArticles();
+  }
+
+  async function confirmArchive(a: Article) {
+    await fetch(`/api/admin/articles/${a.id}`, {
+      method: 'PUT', headers: authHeaders(token),
+      body: JSON.stringify({
+        ...a,
+        archived: 1,
+        archived_at: new Date().toISOString(),
+        archive_reason: archiveReason.trim() || null,
+      }),
+    });
+    setArchiving(null); setArchiveReason(''); loadArticles();
+  }
+
+  async function unarchive(a: Article) {
+    await fetch(`/api/admin/articles/${a.id}`, {
+      method: 'PUT', headers: authHeaders(token),
+      body: JSON.stringify({ ...a, archived: 0, archived_at: null, archive_reason: null }),
     });
     loadArticles();
   }
@@ -93,10 +122,23 @@ export default function Admin() {
     loadArticles();
   }
 
+  async function uploadImage(file: File) {
+    setUploading(true); setUploadedUrl('');
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/api/admin/upload', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: fd,
+    });
+    const { url } = await res.json();
+    setUploadedUrl(url);
+    setUploading(false);
+  }
+
   useEffect(() => {
     if (!token) return;
-    loadBanner();
-    loadArticles();
+    loadBanner(); loadArticles();
   }, [token]);
 
   if (!token) {
@@ -106,13 +148,10 @@ export default function Admin() {
           <img src="/Logos/White Graphic Ledger.png" alt="HTMLedger" className="admin-login-logo" />
           <h1>Admin</h1>
           <input
-            type="password"
-            placeholder="Password"
-            value={pwInput}
+            type="password" placeholder="Password" value={pwInput}
             onChange={e => setPwInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && login()}
-            className={`admin-input ${loginErr ? 'error' : ''}`}
-            autoFocus
+            className={`admin-input ${loginErr ? 'error' : ''}`} autoFocus
           />
           {loginErr && <p className="admin-login-err">Incorrect password</p>}
           <button className="btn btn-primary" onClick={login}>Sign in</button>
@@ -121,16 +160,38 @@ export default function Admin() {
     );
   }
 
+  const active = articles.filter(a => !a.archived);
+  const archived = articles.filter(a => a.archived);
+
   return (
     <div className="admin-page">
+      {/* Archive modal */}
+      {archiving && (
+        <div className="admin-modal-overlay" onClick={() => setArchiving(null)}>
+          <div className="admin-modal" onClick={e => e.stopPropagation()}>
+            <h2>Archive "{archiving.title}"?</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0.5rem 0 1rem' }}>
+              The article will move to /articles/archives/{archiving.slug}. Pinned state is remembered.
+            </p>
+            <div className="admin-field">
+              <label>Reason <span style={{ fontWeight: 400, opacity: 0.6 }}>(optional)</span></label>
+              <input className="admin-input" value={archiveReason} onChange={e => setArchiveReason(e.target.value)}
+                placeholder="e.g. this information is outdated" />
+            </div>
+            <div className="admin-actions">
+              <button className="btn btn-primary" onClick={() => confirmArchive(archiving)}>Archive</button>
+              <button className="admin-btn-sm" onClick={() => setArchiving(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="admin-header">
         <div className="admin-header-left">
           <img src="/Logos/White Graphic Ledger.png" alt="" className="admin-header-logo" />
           <span>HTMLedger Admin</span>
         </div>
-        <button className="admin-signout" onClick={() => { sessionStorage.removeItem(TOKEN_KEY); setToken(''); }}>
-          Sign out
-        </button>
+        <button className="admin-signout" onClick={() => { sessionStorage.removeItem(TOKEN_KEY); setToken(''); }}>Sign out</button>
       </div>
 
       <div className="admin-tabs">
@@ -144,17 +205,11 @@ export default function Admin() {
           <div className="admin-section">
             <div className="admin-section-header">
               <h2>Site Banner</h2>
-              {bannerActive && <span className="admin-badge admin-badge--green">Active</span>}
-              {!bannerActive && <span className="admin-badge">Inactive</span>}
+              {bannerActive ? <span className="admin-badge admin-badge--green">Active</span> : <span className="admin-badge">Inactive</span>}
             </div>
             <div className="admin-field">
               <label>Message</label>
-              <input
-                className="admin-input"
-                value={banner.message}
-                onChange={e => setBanner(b => ({ ...b, message: e.target.value }))}
-                placeholder="e.g. HTMLedger 2.1 is now available!"
-              />
+              <input className="admin-input" value={banner.message} onChange={e => setBanner(b => ({ ...b, message: e.target.value }))} placeholder="e.g. HTMLedger 2.1 is now available!" />
             </div>
             <div className="admin-field">
               <label>Type</label>
@@ -169,13 +224,11 @@ export default function Admin() {
               <input className="admin-input" value={banner.linkUrl ?? ''} onChange={e => setBanner(b => ({ ...b, linkUrl: e.target.value }))} placeholder="https://..." />
             </div>
             <div className="admin-field">
-              <label>Link Text <span style={{ fontWeight: 400, opacity: 0.6 }}>(optional — defaults to "Learn more")</span></label>
+              <label>Link Text <span style={{ fontWeight: 400, opacity: 0.6 }}>(optional)</span></label>
               <input className="admin-input" value={banner.linkText ?? ''} onChange={e => setBanner(b => ({ ...b, linkText: e.target.value }))} placeholder="Learn more" />
             </div>
             <div className="admin-actions">
-              <button className="btn btn-primary" onClick={saveBanner} disabled={!banner.message.trim()}>
-                {bannerSaved ? '✓ Saved' : 'Publish Banner'}
-              </button>
+              <button className="btn btn-primary" onClick={saveBanner} disabled={!banner.message.trim()}>{bannerSaved ? '✓ Saved' : 'Publish Banner'}</button>
               {bannerActive && <button className="admin-btn-danger" onClick={clearBanner}>Remove Banner</button>}
             </div>
           </div>
@@ -185,34 +238,58 @@ export default function Admin() {
           <div className="admin-section">
             <div className="admin-section-header">
               <h2>Articles</h2>
-              <button className="btn btn-primary btn-sm" onClick={() => { setIsNew(true); setEditing({ slug: '', title: '', summary: '', body: '', style: 'plain', published: 0 }); }}>
+              <button className="btn btn-primary btn-sm" onClick={() => { setIsNew(true); setEditing({ slug: '', title: '', summary: '', body: '', style: 'plain', pinned: 0, archived: 0, published: 0 }); }}>
                 + New Article
               </button>
             </div>
-            {articles.length === 0 && <p className="admin-empty">No articles yet.</p>}
+
+            {active.length === 0 && <p className="admin-empty">No articles yet.</p>}
             <div className="admin-article-list">
-              {articles.map(a => (
-                <div key={a.id} className="admin-article-row">
+              {active.map(a => (
+                <div key={a.id} className={`admin-article-row ${a.pinned ? 'admin-article-row--pinned' : ''}`}>
                   <div className="admin-article-info">
+                    {!!a.pinned && <span className="admin-pin-icon">📌</span>}
                     <span className="admin-article-title">{a.title}</span>
                     <span className="admin-article-meta">/{a.slug} · {new Date(a.created_at).toLocaleDateString()}</span>
                   </div>
                   <div className="admin-article-actions">
-                    <span className={`admin-badge ${a.published ? 'admin-badge--green' : ''}`}>
-                      {a.published ? 'Published' : 'Draft'}
-                    </span>
+                    <span className={`admin-badge ${a.published ? 'admin-badge--green' : ''}`}>{a.published ? 'Published' : 'Draft'}</span>
                     <button className="admin-btn-sm" onClick={async () => {
                       const res = await fetch(`/api/admin/articles/${a.id}`, { headers: authHeaders(token) });
                       setIsNew(false); setEditing(await res.json());
                     }}>Edit</button>
-                    <button className="admin-btn-sm" onClick={() => togglePublish(a)}>
-                      {a.published ? 'Unpublish' : 'Publish'}
-                    </button>
+                    <button className="admin-btn-sm" onClick={() => togglePin(a)}>{a.pinned ? 'Unpin' : 'Pin'}</button>
+                    <button className="admin-btn-sm" onClick={() => togglePublish(a)}>{a.published ? 'Unpublish' : 'Publish'}</button>
+                    <button className="admin-btn-sm" onClick={() => { setArchiving(a); setArchiveReason(''); }}>Archive</button>
                     <button className="admin-btn-sm admin-btn-sm--danger" onClick={() => deleteArticle(a.id)}>Delete</button>
                   </div>
                 </div>
               ))}
             </div>
+
+            {archived.length > 0 && (
+              <>
+                <div className="admin-section-divider"><span>Archived</span></div>
+                <div className="admin-article-list">
+                  {archived.map(a => (
+                    <div key={a.id} className="admin-article-row admin-article-row--archived">
+                      <div className="admin-article-info">
+                        <span className="admin-article-title">{a.title}</span>
+                        <span className="admin-article-meta">/{a.slug} · archived {a.archived_at ? new Date(a.archived_at).toLocaleDateString() : ''}</span>
+                      </div>
+                      <div className="admin-article-actions">
+                        <button className="admin-btn-sm" onClick={async () => {
+                          const res = await fetch(`/api/admin/articles/${a.id}`, { headers: authHeaders(token) });
+                          setIsNew(false); setEditing(await res.json());
+                        }}>Edit</button>
+                        <button className="admin-btn-sm" onClick={() => unarchive(a)}>Unarchive</button>
+                        <button className="admin-btn-sm admin-btn-sm--danger" onClick={() => deleteArticle(a.id)}>Delete</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -245,10 +322,34 @@ export default function Admin() {
               <label>Body</label>
               <textarea className="admin-input admin-textarea" value={editing.body ?? ''} onChange={e => setEditing(ed => ({ ...ed!, body: e.target.value }))} rows={18} />
             </div>
+
+            {/* Image upload */}
+            <div className="admin-field">
+              <label>Upload Image</label>
+              <div className="admin-upload-row">
+                <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f); e.target.value = ''; }} />
+                <button className="admin-btn-sm" onClick={() => fileRef.current?.click()} disabled={uploading}>
+                  {uploading ? 'Uploading…' : 'Choose image…'}
+                </button>
+                {uploadedUrl && (
+                  <div className="admin-upload-result">
+                    <code className="admin-upload-md">![alt text]({uploadedUrl})</code>
+                    <button className="admin-btn-sm" onClick={() => navigator.clipboard.writeText(`![alt text](${uploadedUrl})`)}>Copy</button>
+                    <button className="admin-btn-sm" onClick={() => setEditing(ed => ({ ...ed!, body: (ed!.body ?? '') + `\n\n![alt text](${uploadedUrl})` }))}>Insert</button>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="admin-field admin-field--row">
               <label>
                 <input type="checkbox" checked={!!editing.published} onChange={e => setEditing(ed => ({ ...ed!, published: e.target.checked ? 1 : 0 }))} />
                 {' '}Published
+              </label>
+              <label>
+                <input type="checkbox" checked={!!editing.pinned} onChange={e => setEditing(ed => ({ ...ed!, pinned: e.target.checked ? 1 : 0 }))} />
+                {' '}Pinned
               </label>
             </div>
             <div className="admin-actions">
