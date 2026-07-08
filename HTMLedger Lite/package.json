@@ -8,7 +8,7 @@
     "build:cm": "esbuild renderer/cm-entry.js --bundle --minify --outfile=renderer/cm-bundle.js --format=iife",
     "start": "npm run build:cm && electron .",
     "build": "npm run build:cm && electron-builder --win --x64",
-    "build:store": "npm run build:cm && electron-builder --win --x64 --target appx"
+    "build:store": "npm run build:cm && electron-builder --win appx --x64"
   },
   "build": {
     "appId": "com.htmledger.lite",
