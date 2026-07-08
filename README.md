@@ -77,9 +77,7 @@ Everything runs on your machine. HTMLedger never uploads your files, never phone
 
 HTMLedger is fully open source — including this repository and the website at [htmledger.localhost314.com](https://htmledger.localhost314.com). You're welcome to read the code, open issues, or suggest improvements.
 
-> **Windows SmartScreen warning?** New apps without an established download reputation trigger this. Click **More info → Run anyway** to proceed, or review the source here before installing.
-
----
+--
 
 ## About
 
