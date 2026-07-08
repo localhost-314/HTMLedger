@@ -24,7 +24,7 @@ HTMLedger is a desktop HTML editor built for people who work with HTML files eve
 | **Find in folder** | ✓ | — |
 | **Workspace backup** | ✓ | — |
 | **Portable build** | — | ✓ |
-| **Installed size** | ~150 MB | ~260 MB |
+| **Installed size** | ~687 MB | ~260 MB |
 
 Both editions are **100% free**, work **fully offline**, and collect **zero telemetry**. No account. No subscription. No catch.
 
