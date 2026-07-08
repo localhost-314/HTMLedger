@@ -254,10 +254,11 @@ body.theme-lite .hero-bg-grid {
 }
 .nav-link:hover,
 .nav-link.active { color: var(--text-primary); background: var(--bg-card); }
-.nav-cta { margin-left: 0.5rem; }
+.nav-cta { margin-left: 0.75rem; }
 .nav-github-link { display: flex; align-items: center; opacity: 0.6; transition: opacity 0.15s; margin-left: 0.25rem; }
 .nav-github-link:hover { opacity: 1; }
 .nav-github-icon { width: 20px; height: 20px; display: block; }
+.nav-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.12); margin: 0 0.5rem; }
 
 /* ===== Footer ===== */
 .footer {
@@ -278,6 +279,9 @@ body.theme-lite .hero-bg-grid {
 .footer-links { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
 .footer-link { font-size: 0.875rem; color: var(--text-muted); transition: color 0.15s; }
 .footer-link:hover { color: var(--text-secondary); }
+.footer-github-link { display: flex; align-items: center; gap: 0.4rem; }
+.footer-github-icon { width: 16px; height: 16px; opacity: 0.6; display: block; }
+.footer-github-link:hover .footer-github-icon { opacity: 1; }
 .footer-copy { font-size: 0.8125rem; color: var(--text-muted); }
 .footer-by { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--text-muted); }
 .footer-by img { height: 18px; width: auto; opacity: 0.7; }

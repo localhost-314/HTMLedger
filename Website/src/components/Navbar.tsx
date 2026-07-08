@@ -159,6 +159,8 @@ export default function Navbar() {
               <img src="/GitHub_Invertocat_White.png" alt="GitHub" className="nav-github-icon" />
             </a>
 
+            <div className="nav-divider" />
+
             {isLite ? (
               <Link to="/lite/download" className="btn btn-sm nav-cta" style={{ background: '#818cf8', color: '#fff' }}>
                 Get Lite

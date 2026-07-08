@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 
+const GITHUB_REPO = 'https://github.com/localhost-314/HTMLedger';
+
 export default function Footer() {
   const year = new Date().getFullYear();
 
@@ -19,6 +21,10 @@ export default function Footer() {
             <Link to="/tos" className="footer-link">Terms of Service</Link>
             <Link to="/privacy" className="footer-link">Privacy Policy</Link>
             <Link to="/license" className="footer-link">License</Link>
+            <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer" className="footer-link footer-github-link" aria-label="GitHub">
+              <img src="/GitHub_Invertocat_White.png" alt="GitHub" className="footer-github-icon" />
+              GitHub
+            </a>
           </div>
         </div>
         <div className="footer-bottom">
