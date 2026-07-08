@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-interface Banner { message: string; type: 'info' | 'warning' | 'success'; }
+interface Banner { message: string; type: 'info' | 'warning' | 'success'; linkUrl?: string; linkText?: string; }
 
 const DISMISS_KEY = 'banner-dismissed';
 
@@ -30,7 +30,14 @@ export default function SiteBanner() {
 
   return (
     <div className={`site-banner site-banner--${banner.type}`}>
-      <span className="site-banner-msg">{banner.message}</span>
+      <span className="site-banner-msg">
+        {banner.message}
+        {banner.linkUrl && (
+          <a href={banner.linkUrl} className="site-banner-link" target="_blank" rel="noopener noreferrer">
+            {banner.linkText || 'Learn more'}
+          </a>
+        )}
+      </span>
       <button className="site-banner-close" onClick={dismiss} aria-label="Dismiss">✕</button>
     </div>
   );

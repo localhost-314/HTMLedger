@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 interface Article { id: number; slug: string; title: string; summary: string; published: number; created_at: string; }
-interface Banner { message: string; type: 'info' | 'warning' | 'success'; }
+interface Banner { message: string; type: 'info' | 'warning' | 'success'; linkUrl?: string; linkText?: string; }
 
 const TOKEN_KEY = 'admin-token';
 
@@ -16,7 +16,7 @@ export default function Admin() {
   const [tab, setTab] = useState<'banner' | 'articles'>('banner');
 
   // Banner state
-  const [banner, setBanner] = useState<Banner>({ message: '', type: 'info' });
+  const [banner, setBanner] = useState<Banner>({ message: '', type: 'info', linkUrl: '', linkText: '' });
   const [bannerActive, setBannerActive] = useState(false);
   const [bannerSaved, setBannerSaved] = useState(false);
 
@@ -163,6 +163,14 @@ export default function Admin() {
                 <option value="success">Success (green)</option>
                 <option value="warning">Warning (yellow)</option>
               </select>
+            </div>
+            <div className="admin-field">
+              <label>Link URL <span style={{ fontWeight: 400, opacity: 0.6 }}>(optional)</span></label>
+              <input className="admin-input" value={banner.linkUrl ?? ''} onChange={e => setBanner(b => ({ ...b, linkUrl: e.target.value }))} placeholder="https://..." />
+            </div>
+            <div className="admin-field">
+              <label>Link Text <span style={{ fontWeight: 400, opacity: 0.6 }}>(optional — defaults to "Learn more")</span></label>
+              <input className="admin-input" value={banner.linkText ?? ''} onChange={e => setBanner(b => ({ ...b, linkText: e.target.value }))} placeholder="Learn more" />
             </div>
             <div className="admin-actions">
               <button className="btn btn-primary" onClick={saveBanner} disabled={!banner.message.trim()}>

@@ -44,61 +44,64 @@ function RouteTheme() {
   return null;
 }
 
+function AppShell({ dlOpen, dlHint, dlStartQuiz, openDl, openQuiz, onClose }: {
+  dlOpen: boolean; dlHint: 'main' | 'lite' | undefined; dlStartQuiz: boolean;
+  openDl: (h?: 'main' | 'lite') => void; openQuiz: () => void; onClose: () => void;
+}) {
+  const { pathname } = useLocation();
+  const isAdmin = pathname.startsWith('/admin');
+
+  return (
+    <DownloadProvider onOpen={openDl} onOpenQuiz={openQuiz}>
+      <ScrollToTop />
+      <RouteTheme />
+      {!isAdmin && <SiteBanner />}
+      {!isAdmin && <Navbar />}
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/main" element={<MainApp />} />
+          <Route path="/main/features" element={<Features />} />
+          <Route path="/main/download" element={<MainDownload />} />
+          <Route path="/lite" element={<LiteApp />} />
+          <Route path="/lite/features" element={<LiteApp />} />
+          <Route path="/lite/download" element={<LiteDownload />} />
+          <Route path="/download" element={<Navigate to="/" replace />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/tos" element={<TOS />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/license" element={<License />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/articles" element={<Articles />} />
+          <Route path="/articles/:slug" element={<Article />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/main/download/direct" element={<DirectDownload />} />
+          <Route path="/lite/download/direct" element={<LiteDirectDownload />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      {!isAdmin && <Footer />}
+      {!isAdmin && (
+        <DownloadModal open={dlOpen} hint={dlHint} startQuiz={dlStartQuiz} onClose={onClose} />
+      )}
+    </DownloadProvider>
+  );
+}
+
 export default function App() {
   const [dlOpen, setDlOpen] = useState(false);
   const [dlHint, setDlHint] = useState<'main' | 'lite' | undefined>(undefined);
   const [dlStartQuiz, setDlStartQuiz] = useState(false);
 
-  function openDl(hint?: 'main' | 'lite') {
-    setDlHint(hint);
-    setDlStartQuiz(false);
-    setDlOpen(true);
-  }
-
-  function openQuiz() {
-    setDlHint(undefined);
-    setDlStartQuiz(true);
-    setDlOpen(true);
-  }
+  function openDl(hint?: 'main' | 'lite') { setDlHint(hint); setDlStartQuiz(false); setDlOpen(true); }
+  function openQuiz() { setDlHint(undefined); setDlStartQuiz(true); setDlOpen(true); }
 
   return (
     <BrowserRouter>
-      <DownloadProvider onOpen={openDl} onOpenQuiz={openQuiz}>
-        <ScrollToTop />
-        <RouteTheme />
-        <SiteBanner />
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/main" element={<MainApp />} />
-            <Route path="/main/features" element={<Features />} />
-            <Route path="/main/download" element={<MainDownload />} />
-            <Route path="/lite" element={<LiteApp />} />
-            <Route path="/lite/features" element={<LiteApp />} />
-            <Route path="/lite/download" element={<LiteDownload />} />
-            <Route path="/download" element={<Navigate to="/" replace />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/tos" element={<TOS />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/license" element={<License />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/articles" element={<Articles />} />
-            <Route path="/articles/:slug" element={<Article />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/main/download/direct" element={<DirectDownload />} />
-            <Route path="/lite/download/direct" element={<LiteDirectDownload />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-        <Footer />
-        <DownloadModal
-          open={dlOpen}
-          hint={dlHint}
-          startQuiz={dlStartQuiz}
-          onClose={() => setDlOpen(false)}
-        />
-      </DownloadProvider>
+      <AppShell
+        dlOpen={dlOpen} dlHint={dlHint} dlStartQuiz={dlStartQuiz}
+        openDl={openDl} openQuiz={openQuiz} onClose={() => setDlOpen(false)}
+      />
     </BrowserRouter>
   );
 }

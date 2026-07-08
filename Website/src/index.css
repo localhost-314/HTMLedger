@@ -1953,6 +1953,8 @@ body.theme-lite .hero-bg-grid {
   padding: 0.25rem 0.5rem;
 }
 .site-banner-close:hover { opacity: 1; }
+.site-banner-link { margin-left: 0.6rem; font-weight: 600; text-decoration: underline; color: inherit; opacity: 0.9; }
+.site-banner-link:hover { opacity: 1; }
 
 /* ===== Admin ===== */
 .admin-login {
