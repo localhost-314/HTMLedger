@@ -2056,3 +2056,19 @@ body.theme-lite .hero-bg-grid {
 .article-summary { font-size: 1.05rem; color: var(--text-secondary); line-height: 1.6; }
 .article-body { line-height: 1.8; color: var(--text-secondary); }
 .article-body p { margin-bottom: 1.25rem; }
+.article-body--md h1,.article-body--md h2,.article-body--md h3,.article-body--md h4 { color: var(--text-primary); font-weight: 700; margin: 2rem 0 0.75rem; line-height: 1.25; }
+.article-body--md h1 { font-size: 1.75rem; }
+.article-body--md h2 { font-size: 1.35rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+.article-body--md h3 { font-size: 1.1rem; }
+.article-body--md p { margin-bottom: 1.25rem; }
+.article-body--md a { color: var(--accent); text-decoration: underline; }
+.article-body--md a:hover { color: var(--accent-hover); }
+.article-body--md ul,.article-body--md ol { margin: 0 0 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.article-body--md li { color: var(--text-secondary); }
+.article-body--md strong { color: var(--text-primary); font-weight: 600; }
+.article-body--md em { font-style: italic; }
+.article-body--md code { font-family: var(--mono); font-size: 0.875em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; }
+.article-body--md pre { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; overflow-x: auto; margin-bottom: 1.25rem; }
+.article-body--md pre code { background: none; border: none; padding: 0; font-size: 0.875rem; }
+.article-body--md blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 0 0 1.25rem; color: var(--text-muted); font-style: italic; }
+.article-body--md hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }

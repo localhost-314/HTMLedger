@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { marked } from 'marked';
 
-interface Article { id: number; slug: string; title: string; summary: string; body: string; created_at: string; }
+interface Article { id: number; slug: string; title: string; summary: string; body: string; style: 'plain' | 'markdown'; created_at: string; }
 
 export default function Article() {
   const { slug } = useParams<{ slug: string }>();
@@ -23,6 +24,8 @@ export default function Article() {
 
   if (!article) return <div className="article-page container"><p>Loading…</p></div>;
 
+  const isMarkdown = article.style === 'markdown';
+
   return (
     <div className="article-page container">
       <Link to="/articles" className="article-back">← All articles</Link>
@@ -31,11 +34,18 @@ export default function Article() {
         <h1 className="article-title">{article.title}</h1>
         {article.summary && <p className="article-summary">{article.summary}</p>}
       </div>
-      <div className="article-body">
-        {article.body.split('\n\n').map((para, i) => (
-          <p key={i}>{para}</p>
-        ))}
-      </div>
+      {isMarkdown ? (
+        <div
+          className="article-body article-body--md"
+          dangerouslySetInnerHTML={{ __html: marked(article.body) as string }}
+        />
+      ) : (
+        <div className="article-body">
+          {article.body.split('\n\n').map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

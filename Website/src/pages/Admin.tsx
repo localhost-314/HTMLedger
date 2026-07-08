@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-interface Article { id: number; slug: string; title: string; summary: string; published: number; created_at: string; }
+interface Article { id: number; slug: string; title: string; summary: string; style: 'plain' | 'markdown'; published: number; created_at: string; }
 interface Banner { message: string; type: 'info' | 'warning' | 'success'; linkUrl?: string; linkText?: string; }
 
 const TOKEN_KEY = 'admin-token';
@@ -185,7 +185,7 @@ export default function Admin() {
           <div className="admin-section">
             <div className="admin-section-header">
               <h2>Articles</h2>
-              <button className="btn btn-primary btn-sm" onClick={() => { setIsNew(true); setEditing({ slug: '', title: '', summary: '', body: '', published: 0 }); }}>
+              <button className="btn btn-primary btn-sm" onClick={() => { setIsNew(true); setEditing({ slug: '', title: '', summary: '', body: '', style: 'plain', published: 0 }); }}>
                 + New Article
               </button>
             </div>
@@ -233,6 +233,13 @@ export default function Admin() {
             <div className="admin-field">
               <label>Summary</label>
               <input className="admin-input" value={editing.summary ?? ''} onChange={e => setEditing(ed => ({ ...ed!, summary: e.target.value }))} placeholder="Short description shown in the article list" />
+            </div>
+            <div className="admin-field">
+              <label>Style</label>
+              <select className="admin-input" value={editing.style ?? 'plain'} onChange={e => setEditing(ed => ({ ...ed!, style: e.target.value as 'plain' | 'markdown' }))}>
+                <option value="plain">Plain text</option>
+                <option value="markdown">Markdown</option>
+              </select>
             </div>
             <div className="admin-field">
               <label>Body</label>
