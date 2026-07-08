@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useDownloadModal } from '../contexts/DownloadContext';
 
+const GITHUB_REPO   = 'https://github.com/localhost-314/HTMLedger';
 const GITHUB_ISSUES = 'https://github.com/localhost-314/HTMLedger/issues';
 
 function DropMenu({ children, open }: { children: React.ReactNode; open: boolean }) {
@@ -153,6 +154,10 @@ export default function Navbar() {
                 </a>
               </DropMenu>
             </div>
+
+            <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer" className="nav-github-link" aria-label="View on GitHub">
+              <img src="/GitHub_Invertocat_White.png" alt="GitHub" className="nav-github-icon" />
+            </a>
 
             {isLite ? (
               <Link to="/lite/download" className="btn btn-sm nav-cta" style={{ background: '#818cf8', color: '#fff' }}>

@@ -255,6 +255,9 @@ body.theme-lite .hero-bg-grid {
 .nav-link:hover,
 .nav-link.active { color: var(--text-primary); background: var(--bg-card); }
 .nav-cta { margin-left: 0.5rem; }
+.nav-github-link { display: flex; align-items: center; opacity: 0.6; transition: opacity 0.15s; margin-left: 0.25rem; }
+.nav-github-link:hover { opacity: 1; }
+.nav-github-icon { width: 20px; height: 20px; display: block; }
 
 /* ===== Footer ===== */
 .footer {
