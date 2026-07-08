@@ -638,6 +638,8 @@ body.theme-lite .hero-bg-grid {
 .dl-store-coming-icon { font-size: 1.4rem; }
 .dl-store-coming-title { font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); }
 .dl-store-coming-sub { font-size: 0.75rem; color: #818cf8; margin-top: 0.1rem; }
+.dl-store-status-link { color: #818cf8; text-decoration: underline; }
+.dl-store-status-link:hover { color: #a5b4fc; }
 
 .dl-direct-link {
   margin-top: 1rem;
@@ -1927,7 +1929,8 @@ body.theme-lite .hero-bg-grid {
 
 /* ===== Site Banner ===== */
 .site-banner {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 200;
   display: flex;
   align-items: center;

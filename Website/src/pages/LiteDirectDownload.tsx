@@ -34,7 +34,7 @@ export default function LiteDirectDownload() {
                 <span className="dl-store-coming-icon">🏪</span>
                 <div>
                   <div className="dl-store-coming-title">Microsoft Store</div>
-                  <div className="dl-store-coming-sub">Coming soon</div>
+                  <div className="dl-store-coming-sub">Coming soon &mdash; <a href="https://htmledger.localhost314.com/articles/lite-ms-store-status" target="_blank" rel="noopener noreferrer" className="dl-store-status-link">Status Updates</a></div>
                 </div>
               </div>
             </div>

@@ -2,6 +2,13 @@ import { authed, unauthorized } from '../../../_shared/auth';
 
 interface Env { CMS: D1Database; ADMIN_PASSWORD: string; }
 
+export const onRequestGet: PagesFunction<Env> = async ({ request, env, params }) => {
+  if (!authed(request, env)) return unauthorized();
+  const row = await env.CMS.prepare('SELECT * FROM articles WHERE id = ?').bind(params.id).first();
+  if (!row) return Response.json(null, { status: 404 });
+  return Response.json(row);
+};
+
 export const onRequestPut: PagesFunction<Env> = async ({ request, env, params }) => {
   if (!authed(request, env)) return unauthorized();
   const { slug, title, summary, body, published } = await request.json() as Record<string, string>;

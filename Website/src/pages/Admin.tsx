@@ -201,7 +201,10 @@ export default function Admin() {
                     <span className={`admin-badge ${a.published ? 'admin-badge--green' : ''}`}>
                       {a.published ? 'Published' : 'Draft'}
                     </span>
-                    <button className="admin-btn-sm" onClick={() => { setIsNew(false); setEditing(a); }}>Edit</button>
+                    <button className="admin-btn-sm" onClick={async () => {
+                      const res = await fetch(`/api/admin/articles/${a.id}`, { headers: authHeaders(token) });
+                      setIsNew(false); setEditing(await res.json());
+                    }}>Edit</button>
                     <button className="admin-btn-sm" onClick={() => togglePublish(a)}>
                       {a.published ? 'Unpublish' : 'Publish'}
                     </button>
