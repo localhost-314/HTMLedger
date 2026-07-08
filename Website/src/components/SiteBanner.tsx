@@ -27,8 +27,8 @@ export default function SiteBanner() {
       document.documentElement.style.removeProperty(CSS_VAR);
       return;
     }
-    const ro = new ResizeObserver(([entry]) => {
-      document.documentElement.style.setProperty(CSS_VAR, `${entry.contentRect.height}px`);
+    const ro = new ResizeObserver(() => {
+      document.documentElement.style.setProperty(CSS_VAR, `${ref.current!.offsetHeight}px`);
     });
     ro.observe(ref.current);
     return () => { ro.disconnect(); document.documentElement.style.removeProperty(CSS_VAR); };
