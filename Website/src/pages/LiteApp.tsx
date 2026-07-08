@@ -57,7 +57,7 @@ const LITE_FAQS = [
   },
   {
     q: 'How much smaller is Lite?',
-    a: 'HTMLedger Lite ships at roughly ~25 MB installed vs ~150 MB for the full app. Monaco editor alone accounts for most of that difference.',
+    a: 'HTMLedger Lite installs at roughly ~260 MB vs ~690 MB for the full app. Both bundle Electron and Chromium — Monaco editor accounts for most of the remaining difference.',
   },
   {
     q: 'Does Lite support TypeScript / JSX?',
@@ -114,8 +114,8 @@ export default function LiteApp() {
           {/* Dispatchy-style stats */}
           <div className="hsd-stats">
             <div className="hsd-stat">
-              <div className="hsd-key" style={{ color: '#a5b4fc' }}>~25 MB</div>
-              <div className="hsd-desc">ultralight install</div>
+              <div className="hsd-key" style={{ color: '#a5b4fc' }}>~260 MB</div>
+              <div className="hsd-desc">installed size</div>
             </div>
             <div className="hsd-divider" />
             <div className="hsd-stat">

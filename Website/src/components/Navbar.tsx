@@ -124,7 +124,7 @@ export default function Navbar() {
                 </Link>
                 <Link to="/lite/download" className="nav-drop-item">
                   <span className="nav-drop-label">Download</span>
-                  <span className="nav-drop-desc">~25 MB, free for Windows</span>
+                  <span className="nav-drop-desc">~260 MB installed, free for Windows</span>
                 </Link>
               </DropMenu>
             </div>

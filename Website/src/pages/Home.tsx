@@ -6,7 +6,7 @@ import DummyEditorWidget from '../widgets/DummyEditorWidget';
 
 const COMPARE = [
   { feature: 'Editor engine',         main: 'Monaco (VS Code)',  lite: 'CodeMirror 6' },
-  { feature: 'Install size',          main: '~150 MB',           lite: '~25 MB' },
+  { feature: 'Install size',          main: '~690 MB',           lite: '~260 MB' },
   { feature: 'Syntax highlighting',   main: '11 file types',     lite: '11 file types' },
   { feature: 'Multi-tab editing',     main: true,                lite: true },
   { feature: 'Live HTML preview',     main: true,                lite: true },
@@ -278,7 +278,7 @@ export default function Home() {
           <div className="hub-handoff hub-handoff--lite">
             <div className="hub-handoff-text">
               <div className="hub-handoff-label" style={{ color: '#818cf8', background: 'rgba(129,140,248,0.12)' }}>
-                ~25 MB · portable or installer
+                ~260 MB installed · free for Windows
               </div>
               <h3 className="hub-handoff-title">Fast enough to love. Light enough to go anywhere.</h3>
               <p className="hub-handoff-sub">
