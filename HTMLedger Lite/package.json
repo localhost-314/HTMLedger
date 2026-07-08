@@ -7,7 +7,8 @@
   "scripts": {
     "build:cm": "esbuild renderer/cm-entry.js --bundle --minify --outfile=renderer/cm-bundle.js --format=iife",
     "start": "npm run build:cm && electron .",
-    "build": "npm run build:cm && electron-builder --win --x64"
+    "build": "npm run build:cm && electron-builder --win --x64",
+    "build:store": "npm run build:cm && electron-builder --win --x64 --target appx"
   },
   "build": {
     "appId": "com.htmledger.lite",
@@ -19,6 +20,12 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "appx": {
+      "applicationId": "App",
+      "identityName": "localhost314.HTMLedgerLite",
+      "publisher": "CN=4F168544-70A7-4A96-864D-CD21272D099F",
+      "publisherDisplayName": "localhost:314"
     },
     "publish": {
       "provider": "github",
