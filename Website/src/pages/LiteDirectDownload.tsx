@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const LITE_URL = 'https://github.com/localhost-314/HTMLedger/releases/download/v2.0.2-lite/HTMLedger.Lite.Setup.2.0.2.exe';
-const GITHUB_URL = 'https://github.com/localhost-314/HTMLedger';
+const GITHUB_URL = 'https://github.com/localhost-314/HTMLedger/tree/main/HTMLedger%20Lite';
 const VERSION = '2.0.2';
 const ACCENT = '#818cf8';
 
@@ -31,13 +31,13 @@ export default function LiteDirectDownload() {
             </p>
             <div className="direct-dl-modal-badge">
               <ms-store-badge
-                productid="9NFD2K13FB56"
-                window-mode="direct"
-                theme="dark"
+                productid="9nfd2k13fb56"
+                window-mode="full"
+                theme="auto"
                 size="large"
                 language="en-us"
-                animation="on"
-              />
+                animation="on">
+              </ms-store-badge>
             </div>
             <div className="direct-dl-modal-actions">
               <button className="btn btn-ghost" onClick={() => setShowWarning(false)}>Cancel</button>

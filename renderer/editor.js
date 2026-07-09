@@ -46,6 +46,10 @@ let customKeybindings  = {};
 let quickOpenFiles     = [];
 let quickOpenIdx       = -1;
 const IMAGE_EXTS       = new Set(['png','jpg','jpeg','gif','webp','ico','bmp']);
+let previewMode        = 'server';
+let previewServerPort  = null;
+let recentlyClosed     = [];
+let deviceFrame        = 'none'; // 'none' | 'mobile' | 'tablet'
 
 // Default app-level keybindings (normalized lowercase)
 const DEFAULT_BINDINGS = {
@@ -100,7 +104,26 @@ require(['vs/editor/editor.main'], async function() {
   defineTheme();
   createEditor();
   installWidgetBoundsFix();
-  loadInitialFile().catch(() => {}).then(updateEmptyState);
+  await loadInitialFile().catch(() => {});
+  // Start preview server if workspace is open and mode is server
+  if (workspaceFolder && window.api.startPreviewServer) {
+    window.api.startPreviewServer(workspaceFolder).then(r => {
+      if (r && r.port) { previewServerPort = r.port; updatePreview(); }
+    });
+  }
+  // Restore session (previously open tabs) if no file was passed via argv
+  if (workspaceFolders.length > 0 && tabs.length === 0) {
+    window.api.getSession && window.api.getSession().then(async sess => {
+      if (sess && sess.tabs && sess.activeTab) {
+        for (const p of sess.tabs) {
+          try { await openTab(p); } catch {}
+        }
+        const found = tabs.find(t => t.path === sess.activeTab);
+        if (found) switchTab(found);
+      }
+    }).catch(() => {});
+  }
+  updateEmptyState();
   try { loadWorkspaceSidebar(); } catch(e) {}
   bindEvents();
   document.getElementById('sidebar-sort').value = sidebarSort;
@@ -144,6 +167,7 @@ async function loadAndApplySettings() {
     if (s.cursorStyle)           cursorStyle       = s.cursorStyle;
     if (s.autoUpdates   !== undefined) autoUpdatesOn = s.autoUpdates;
     if (s.keybindings)           customKeybindings = s.keybindings;
+    if (s.previewMode)           previewMode       = s.previewMode;
     // One-time migration: old default was false, new default is true.
     // Merge wordWrap:true back into the saved file so it persists across restarts.
     if (!localStorage.getItem('htmledger-wrap-migrated') && !wrapOn) {
@@ -267,6 +291,17 @@ document.addEventListener('settings-changed', ev => {
   if (s.cursorStyle)                     cursorStyle      = s.cursorStyle;
   if (s.autoUpdates       !== undefined) autoUpdatesOn    = s.autoUpdates;
   if (s.keybindings)                     customKeybindings= s.keybindings;
+  if (s.previewMode) {
+    const prev = previewMode;
+    previewMode = s.previewMode;
+    if (previewMode === 'server' && !previewServerPort && workspaceFolder && window.api.startPreviewServer) {
+      window.api.startPreviewServer(workspaceFolder).then(r => {
+        if (r && r.port) { previewServerPort = r.port; updatePreview(); }
+      });
+    } else if (previewMode === 'legacy' && prev !== 'legacy') {
+      updatePreview();
+    }
+  }
 
   if (monacoEditor) {
     monacoEditor.updateOptions({
@@ -702,11 +737,15 @@ function sortTree(nodes) {
   const sorted = [...nodes].sort((a, b) => {
     const af = a.type === 'folder', bf = b.type === 'folder';
     if (af !== bf) return af ? -1 : 1; // folders first always
-    if (sidebarSort === 'name-desc') return b.name.localeCompare(a.name);
+    if (sidebarSort === 'name-desc')     return b.name.localeCompare(a.name);
     if (sidebarSort === 'type') {
       const ea = a.name.split('.').pop().toLowerCase(), eb = b.name.split('.').pop().toLowerCase();
       return ea.localeCompare(eb) || a.name.localeCompare(b.name);
     }
+    if (sidebarSort === 'modified-desc') return (b.modified || 0) - (a.modified || 0);
+    if (sidebarSort === 'modified-asc')  return (a.modified || 0) - (b.modified || 0);
+    if (sidebarSort === 'size-desc')     return (b.size || 0) - (a.size || 0);
+    if (sidebarSort === 'size-asc')      return (a.size || 0) - (b.size || 0);
     return a.name.localeCompare(b.name); // name-asc default
   });
   return sorted.map(n => n.children ? { ...n, children: sortTree(n.children) } : n);
@@ -1055,9 +1094,11 @@ function closeTab(tab, e) {
   if (e) e.stopPropagation();
   if (tab.isDirty && !confirm(`"${tab.name}" has unsaved changes. Close anyway?`)) return;
   window.api.unwatchFile(tab.path);
+  if (!tab.isImage) recentlyClosed.push(tab.path);
+  if (recentlyClosed.length > 20) recentlyClosed.shift();
   const idx = tabs.indexOf(tab);
   tabs.splice(idx, 1);
-  tab.model.dispose();
+  if (tab.model) tab.model.dispose();
   if (tabs.length === 0) {
     activeTab = null;
     monacoEditor.setModel(monaco.editor.createModel('', 'html'));
@@ -1076,16 +1117,82 @@ function closeTab(tab, e) {
 function renderTabBar() {
   const list = document.getElementById('tabs-list');
   list.innerHTML = '';
-  tabs.forEach(tab => {
+  let dragSrc = null;
+  tabs.forEach((tab, i) => {
     const el = document.createElement('div');
     el.className = 'tab' + (tab === activeTab ? ' active' : '') + (tab.isDirty ? ' dirty' : '');
+    el.draggable = true;
     const ic  = fileIconClass(tab.name);
     const lbl = fileIconLabel(tab.name);
     el.innerHTML = `<span class="tab-icon ${ic}">${lbl}</span><span class="tab-name" title="${tab.path}">${tab.name}</span><span class="tab-dirty-dot"></span><span class="tab-close" title="Close">✕</span>`;
+
     el.addEventListener('click', () => switchTab(tab));
     el.querySelector('.tab-close').addEventListener('click', e => closeTab(tab, e));
+
+    // Double-click tab name to rename file
+    el.querySelector('.tab-name').addEventListener('dblclick', e => {
+      e.stopPropagation();
+      startTabRename(tab, el.querySelector('.tab-name'));
+    });
+
+    // Drag-and-drop reorder
+    el.addEventListener('dragstart', ev => {
+      dragSrc = i;
+      ev.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragover', ev => {
+      ev.preventDefault();
+      ev.dataTransfer.dropEffect = 'move';
+      el.classList.add('tab-drag-over');
+    });
+    el.addEventListener('dragleave', () => el.classList.remove('tab-drag-over'));
+    el.addEventListener('drop', ev => {
+      ev.preventDefault();
+      el.classList.remove('tab-drag-over');
+      if (dragSrc === null || dragSrc === i) return;
+      const moved = tabs.splice(dragSrc, 1)[0];
+      tabs.splice(i, 0, moved);
+      renderTabBar();
+    });
+    el.addEventListener('dragend', () => { dragSrc = null; });
+
     list.appendChild(el);
   });
+}
+
+function startTabRename(tab, nameEl) {
+  const oldName = tab.name;
+  const inp = document.createElement('input');
+  inp.className = 'tab-rename-input';
+  inp.value = oldName;
+  inp.style.cssText = 'width:120px;background:var(--bg-primary);border:1px solid var(--accent);color:var(--text-primary);border-radius:3px;padding:0 4px;font-size:12px;font-family:inherit;outline:none';
+  nameEl.replaceWith(inp);
+  inp.select();
+  const commit = async () => {
+    const newName = inp.value.trim();
+    if (!newName || newName === oldName) { renderTabBar(); return; }
+    const dir = tab.path.replace(/\\/g, '/').split('/').slice(0, -1).join('/');
+    const newPath = dir + '/' + newName;
+    const res = await window.api.renameFile(tab.path, newPath.replace(/\//g, '\\'));
+    if (res.success) {
+      window.api.unwatchFile(tab.path);
+      tab.path = newPath.replace(/\//g, '\\');
+      tab.name = newName;
+      tab.language = detectLanguage(newName);
+      window.api.watchFile(tab.path);
+      if (tab.model) monaco.editor.getModel(tab.model.uri)?.dispose?.();
+      const uri = monaco.Uri.file(tab.path);
+      tab.model = monaco.editor.createModel(tab.model ? monacoEditor.getValue() : '', tab.language, uri);
+      monacoEditor.setModel(tab.model);
+      loadWorkspaceSidebar();
+    }
+    renderTabBar();
+  };
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); commit(); }
+    if (e.key === 'Escape') renderTabBar();
+  });
+  inp.addEventListener('blur', commit);
 }
 
 /* ── Recent files tracking ── */
@@ -1157,7 +1264,12 @@ function updatePreview() {
       warnBar.dataset.dismissed = '';
     } else {
       warnBar.style.display = 'none';
-      setPreviewSrc(URL.createObjectURL(new Blob([content], { type: 'text/html' })));
+      if (previewMode === 'server' && previewServerPort && activeTab?.path && workspaceFolder) {
+        const relPath = activeTab.path.replace(/\\/g, '/').slice(workspaceFolder.replace(/\\/g, '/').length).replace(/^\//, '');
+        frame.src = `http://127.0.0.1:${previewServerPort}/${relPath}`;
+      } else {
+        setPreviewSrc(URL.createObjectURL(new Blob([content], { type: 'text/html' })));
+      }
     }
     monacoEditor.layout();
   } else if (lang === 'xml' && isSVG) {
@@ -2264,7 +2376,14 @@ function bindEvents() {
   document.getElementById('btn-add-folder').onclick         = addExtraFolder;
 
   document.getElementById('btn-dmarc-view').onclick    = toggleDMARCView;
-  document.getElementById('btn-refresh-preview').onclick = updatePreview;
+  document.getElementById('btn-refresh-preview').onclick = () => {
+    const frame = document.getElementById('preview-frame');
+    if (previewMode === 'server' && frame.src.startsWith('http://127.0.0.1:')) {
+      try { frame.contentWindow.location.reload(); } catch { updatePreview(); }
+    } else {
+      updatePreview();
+    }
+  };
   document.getElementById('btn-open-browser').onclick = () => {
     if (activeTab) window.api.openInExplorer(activeTab.path);
     else showToast('No file open');
@@ -2369,14 +2488,35 @@ function bindEvents() {
   });
 
   // Sidebar context menu
-  document.getElementById('sctx-open').onclick     = () => { const p = sidebarCtxTarget; hideSidebarCtx(); if (p) openTab(p); };
-  document.getElementById('sctx-pin').onclick      = () => { const p = sidebarCtxTarget; hideSidebarCtx(); if (p) { _pinnedFiles.includes(p) ? _unpinFile(p) : _pinFile(p); } };
-  document.getElementById('sctx-rename').onclick   = () => { const p = sidebarCtxTarget; hideSidebarCtx(); if (p) renameSidebarFile(p); };
-  document.getElementById('sctx-explorer').onclick = () => { const p = sidebarCtxTarget; hideSidebarCtx(); if (p) window.api.openInExplorer(p); };
-  document.getElementById('sctx-delete').onclick   = () => { const p = sidebarCtxTarget; hideSidebarCtx(); if (p) deleteSidebarFile(p); };
+  document.getElementById('sctx-open').onclick      = () => { const p = sidebarCtxTarget; hideSidebarCtx(); if (p) openTab(p); };
+  document.getElementById('sctx-pin').onclick       = () => { const p = sidebarCtxTarget; hideSidebarCtx(); if (p) { _pinnedFiles.includes(p) ? _unpinFile(p) : _pinFile(p); } };
+  document.getElementById('sctx-rename').onclick    = () => { const p = sidebarCtxTarget; hideSidebarCtx(); if (p) renameSidebarFile(p); };
+  document.getElementById('sctx-duplicate').onclick = () => {
+    const p = sidebarCtxTarget; hideSidebarCtx();
+    if (!p) return;
+    const parts = p.replace(/\\/g, '/').split('/');
+    const base  = parts.pop();
+    const dot   = base.lastIndexOf('.');
+    const name  = dot > 0 ? base.slice(0, dot) : base;
+    const ext   = dot > 0 ? base.slice(dot) : '';
+    const dest  = [...parts, name + '-copy' + ext].join('/').replace(/\//g, '\\');
+    window.api.copyFile(p, dest).then(r => {
+      if (r.success) { loadWorkspaceSidebar(); openTab(dest); }
+      else showToast('Duplicate failed: ' + r.error);
+    });
+  };
+  document.getElementById('sctx-explorer').onclick  = () => { const p = sidebarCtxTarget; hideSidebarCtx(); if (p) window.api.openInExplorer(p); };
+  document.getElementById('sctx-delete').onclick    = () => { const p = sidebarCtxTarget; hideSidebarCtx(); if (p) deleteSidebarFile(p); };
   document.addEventListener('mousedown', e => {
     if (!document.getElementById('sidebar-ctx').contains(e.target)) hideSidebarCtx();
     if (snippetsPanelOpen && !document.getElementById('snippets-panel').contains(e.target) && !e.target.closest('#btn-snippets')) closeSnippetsPanel();
+  });
+
+  // Session save on close
+  window.addEventListener('beforeunload', () => {
+    if (tabs.length > 0 && window.api.saveSession) {
+      window.api.saveSession({ tabs: tabs.map(t => t.path), activeTab: activeTab?.path });
+    }
   });
 
   // Keyboard shortcuts
@@ -2386,6 +2526,12 @@ function bindEvents() {
     if (matchesBinding(e, 'close-tab'))       { e.preventDefault(); if (activeTab) closeTab(activeTab); }
     if (matchesBinding(e, 'quick-open'))      { e.preventDefault(); openQuickOpen(); }
     if (matchesBinding(e, 'toggle-terminal')) { e.preventDefault(); toggleTerminal(); }
+    // Reopen last closed tab
+    if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+      e.preventDefault();
+      const last = recentlyClosed.pop();
+      if (last) openTab(last);
+    }
     if (e.key === 'Escape') {
       closeSnippetsPanel(); closeSettingsModal(); hideSidebarCtx();
       closeQuickOpen();
@@ -2408,10 +2554,34 @@ function bindEvents() {
 }
 
 /* ── Feature controls ── */
+function _saveSettings() {
+  window.api.saveSettings({
+    fontSize, fontFamily, tabSize, lineHeight, minimap: minimapOn, wordWrap: wrapOn,
+    autoSave: autoSaveOn, autoSaveDelay, layout: layoutMode, formatOnSave,
+    fontLigatures, autoCloseBrackets, autoCloseTags, renderWhitespace, cursorStyle,
+    autoUpdates: autoUpdatesOn, keybindings: customKeybindings, previewMode,
+  });
+}
+
 function setFontSize(size) {
   fontSize = Math.max(10, Math.min(24, size));
   monacoEditor.updateOptions({ fontSize });
   document.getElementById('font-display').textContent = fontSize;
+  _saveSettings();
+}
+
+function setDeviceFrame(mode) {
+  deviceFrame = mode;
+  const frame = document.getElementById('preview-frame');
+  const btns  = document.querySelectorAll('.dev-frame-btn');
+  btns.forEach(b => b.classList.toggle('on', b.dataset.frame === mode));
+  if (mode === 'mobile') {
+    frame.style.width = '375px'; frame.style.margin = '0 auto'; frame.style.height = '100%';
+  } else if (mode === 'tablet') {
+    frame.style.width = '768px'; frame.style.margin = '0 auto'; frame.style.height = '100%';
+  } else {
+    frame.style.width = ''; frame.style.margin = ''; frame.style.height = '';
+  }
 }
 
 function toggleSidebar() {

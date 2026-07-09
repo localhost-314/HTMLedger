@@ -119,7 +119,7 @@ export default function Home() {
                 </a>
                 <Link to="/lite" className="btn btn-ghost">Explore →</Link>
               </div>
-              <a href="https://github.com/localhost-314/HTMLedger" className="hub-card-oss hub-card-oss--lite" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/localhost-314/HTMLedger/tree/main/HTMLedger%20Lite" className="hub-card-oss hub-card-oss--lite" target="_blank" rel="noopener noreferrer">
                 Fully open source · View code →
               </a>
             </div>

@@ -292,6 +292,18 @@
       </div>
       <div id="u-rw-specific-wrap">${wsSelector}</div>
       <div class="usp-divider"></div>
+      <div class="usp-section-label">PREVIEW</div>
+      <div class="usp-row">
+        <label class="usp-lbl">
+          File Preview Mode
+          <small class="usp-hint">Local Server serves linked CSS/JS/modules — Legacy uses a blob URL</small>
+        </label>
+        <div class="usp-chips" id="u-pm">
+          <button class="usp-chip${(_cfg.previewMode||'server')==='server'?' on':''}" data-v="server">Local Server</button>
+          <button class="usp-chip${(_cfg.previewMode||'server')==='legacy'?' on':''}" data-v="legacy">Legacy (Blob URL)</button>
+        </div>
+      </div>
+      <div class="usp-divider"></div>
       <div class="usp-section-label">UPDATES</div>
       <div class="usp-row">
         <label class="usp-lbl">
@@ -347,6 +359,7 @@
       _cfg.theme = v;
       _applyTheme(v);
     });
+    _chips('#u-pm', v => { _cfg.previewMode = v; });
     _on('#u-au', 'change', e => { _cfg.autoUpdates    = e.target.checked; });
     _on('#u-rn', 'change', e => { _cfg.showReleaseNotes = e.target.checked; });
     _on('#u-view-rn', 'click', () => {
@@ -779,6 +792,42 @@
 
 /* ── Changelog ─────────────────────────────────────────────────────────── */
 const CHANGELOG = {
+  '2.1.0': {
+    summary: 'Local server preview, session restore, recently closed tabs, tab reordering, and more.',
+    sections: [
+      {
+        title: 'Preview',
+        items: [
+          'Built-in local HTTP server for preview — linked CSS, JS, and modules now load correctly',
+          'Device frame toggle in preview pane — switch between mobile (375px), tablet (768px), and full width',
+          'Settings → App → Preview Mode: switch between Local Server and Legacy (blob URL)',
+          'Refresh button forces a full reload in server mode',
+        ],
+      },
+      {
+        title: 'Tabs',
+        items: [
+          'Session restore — all open tabs are saved and restored on next launch',
+          'Recently closed tabs — reopen the last closed tab with Ctrl+Shift+T',
+          'Drag-and-drop to reorder tabs',
+          'Double-click a tab name to rename the file inline',
+        ],
+      },
+      {
+        title: 'Sidebar',
+        items: [
+          'Duplicate file — right-click any file to create a copy',
+          'More sort options: Recently Modified, Oldest Modified, Largest First, Smallest First',
+        ],
+      },
+      {
+        title: 'Editor',
+        items: [
+          'Font size set in the toolbar now persists after closing the app',
+        ],
+      },
+    ],
+  },
   '2.0.2': {
     summary: 'Fixes the release notes not appearing after updating.',
     sections: [

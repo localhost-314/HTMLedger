@@ -104,7 +104,7 @@ export default function LiteApp() {
 
           <div className="hero-oss">
             Open source &middot;{' '}
-            <a href="https://github.com/localhost-314/HTMLedger" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/localhost-314/HTMLedger/tree/main/HTMLedger%20Lite" target="_blank" rel="noopener noreferrer">
               View on GitHub ↗
             </a>
           </div>

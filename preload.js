@@ -83,4 +83,15 @@ contextBridge.exposeInMainWorld('api', {
   // Workspaces
   getWorkspaces:  ()  => ipcRenderer.invoke('get-workspaces'),
   saveWorkspaces: (w) => ipcRenderer.invoke('save-workspaces', w),
+
+  // Local HTTP preview server
+  startPreviewServer: (folder) => ipcRenderer.invoke('start-preview-server', folder),
+  stopPreviewServer:  ()       => ipcRenderer.invoke('stop-preview-server'),
+
+  // Session (open tabs)
+  getSession:  ()     => ipcRenderer.invoke('get-session'),
+  saveSession: (data) => ipcRenderer.invoke('save-session', data),
+
+  // Copy file (duplicate)
+  copyFile: (src, dest) => ipcRenderer.invoke('copy-file', src, dest),
 });

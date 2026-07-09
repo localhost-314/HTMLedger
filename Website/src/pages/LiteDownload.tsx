@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-const GITHUB_URL = 'https://github.com/localhost-314/HTMLedger';
+const GITHUB_URL = 'https://github.com/localhost-314/HTMLedger/tree/main/HTMLedger%20Lite';
 const VERSION = '2.0.2';
 const ACCENT = '#818cf8';
 

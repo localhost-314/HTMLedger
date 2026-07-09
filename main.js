@@ -301,7 +301,11 @@ ipcMain.handle('list-dir-tree', async (event, folderPath) => {
         .map(e => ({ name: e.name, path: path.join(dir, e.name), type: 'folder', children: buildTree(path.join(dir, e.name), depth + 1) }));
       const files = entries.filter(e => e.isFile() && (TEXT_RE.test(e.name) || IMAGE_RE.test(e.name)))
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map(e => ({ name: e.name, path: path.join(dir, e.name), type: 'file' }));
+        .map(e => {
+          const fp = path.join(dir, e.name);
+          try { const st = fs.statSync(fp); return { name: e.name, path: fp, type: 'file', modified: st.mtimeMs, size: st.size }; }
+          catch { return { name: e.name, path: fp, type: 'file', modified: 0, size: 0 }; }
+        });
       return [...folders, ...files];
     } catch { return []; }
   }
@@ -418,6 +422,74 @@ ipcMain.handle('get-deploy-configs', async () => {
 ipcMain.handle('save-deploy-configs', async (event, configs) => {
   const f = path.join(app.getPath('userData'), 'deploy-configs.json');
   fs.writeFileSync(f, JSON.stringify(configs, null, 2), 'utf8');
+});
+
+// --- Local HTTP preview server ---
+const http = require('http');
+let previewServer     = null;
+let previewServerPort = null;
+
+ipcMain.handle('start-preview-server', async (event, folderPath) => {
+  if (previewServer) {
+    try { await new Promise(res => previewServer.close(res)); } catch {}
+    previewServer = null; previewServerPort = null;
+  }
+  return new Promise((resolve) => {
+    const server = http.createServer((req, res) => {
+      let urlPath = req.url.split('?')[0];
+      if (urlPath === '/') urlPath = '/index.html';
+      try { urlPath = decodeURIComponent(urlPath); } catch {}
+      const filePath = path.join(folderPath, urlPath.replace(/\//g, path.sep));
+      const norm = path.normalize(filePath);
+      if (!norm.startsWith(path.normalize(folderPath))) {
+        res.writeHead(403); res.end('Forbidden'); return;
+      }
+      fs.readFile(norm, (err, data) => {
+        if (err) { res.writeHead(404); res.end('Not found'); return; }
+        const ext = path.extname(norm).toLowerCase();
+        const MIME = {
+          '.html':'text/html;charset=utf-8', '.htm':'text/html;charset=utf-8',
+          '.css':'text/css', '.js':'application/javascript', '.mjs':'application/javascript',
+          '.json':'application/json', '.xml':'application/xml', '.svg':'image/svg+xml',
+          '.png':'image/png', '.jpg':'image/jpeg', '.jpeg':'image/jpeg',
+          '.gif':'image/gif', '.webp':'image/webp', '.ico':'image/x-icon',
+          '.woff':'font/woff', '.woff2':'font/woff2', '.ttf':'font/ttf', '.otf':'font/otf',
+        };
+        res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+        res.end(data);
+      });
+    });
+    server.listen(0, '127.0.0.1', () => {
+      previewServer = server;
+      previewServerPort = server.address().port;
+      resolve({ port: previewServerPort });
+    });
+    server.on('error', () => resolve({ port: null }));
+  });
+});
+
+ipcMain.handle('stop-preview-server', async () => {
+  if (previewServer) {
+    try { await new Promise(res => previewServer.close(res)); } catch {}
+    previewServer = null; previewServerPort = null;
+  }
+  return { success: true };
+});
+
+// --- Session (open tabs) ---
+ipcMain.handle('get-session', async () => {
+  try { return JSON.parse(fs.readFileSync(path.join(app.getPath('userData'), 'session.json'), 'utf8')); }
+  catch { return null; }
+});
+ipcMain.handle('save-session', async (event, data) => {
+  fs.writeFileSync(path.join(app.getPath('userData'), 'session.json'), JSON.stringify(data, null, 2), 'utf8');
+  return { success: true };
+});
+
+// --- Copy file (for Duplicate) ---
+ipcMain.handle('copy-file', async (event, srcPath, destPath) => {
+  try { fs.copyFileSync(srcPath, destPath); return { success: true }; }
+  catch (e) { return { success: false, error: e.message }; }
 });
 
 // --- Binary file read (images) ---
