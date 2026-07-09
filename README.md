@@ -27,7 +27,6 @@ HTMLedger is a desktop HTML editor built for people who work with HTML files eve
 | **Installed size** | ~687 MB | ~260 MB |
 
 Both editions are **100% free**, work **fully offline**, and collect **zero telemetry**. No account. No subscription. No catch.
-
 ---
 
 ## HTMLedger
@@ -63,7 +62,11 @@ The ultralight edition built on CodeMirror 6. Fast to open, small to ship, and f
 - **Portable build** — runs directly from a folder, no installer or admin rights needed
 - **Settings panel** — font size, tab size, and theme
 
-[Download HTMLedger Lite](https://htmledger.localhost314.com/lite/download) · [Learn more](https://htmledger.localhost314.com/lite)
+<a href="https://apps.microsoft.com/detail/9NFD2K13FB56?referrer=appbadge&mode=full" target="_blank"  rel="noopener noreferrer">
+	<img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
+</a>
+
+[Download HTMLedger Lite Directly From Us →](https://htmledger.localhost314.com/lite/download/direct) · [Learn more](https://htmledger.localhost314.com/lite)
 
 ---
 
