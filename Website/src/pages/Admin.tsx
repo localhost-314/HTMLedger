@@ -79,27 +79,35 @@ export default function Admin() {
     loadArticles();
   }
 
+  async function fetchFull(id: number) {
+    const res = await fetch(`/api/admin/articles/${id}`, { headers: authHeaders(token) });
+    return res.json();
+  }
+
   async function togglePublish(a: Article) {
+    const full = await fetchFull(a.id);
     await fetch(`/api/admin/articles/${a.id}`, {
       method: 'PUT', headers: authHeaders(token),
-      body: JSON.stringify({ ...a, published: a.published ? 0 : 1 }),
+      body: JSON.stringify({ ...full, published: a.published ? 0 : 1 }),
     });
     loadArticles();
   }
 
   async function togglePin(a: Article) {
+    const full = await fetchFull(a.id);
     await fetch(`/api/admin/articles/${a.id}`, {
       method: 'PUT', headers: authHeaders(token),
-      body: JSON.stringify({ ...a, pinned: a.pinned ? 0 : 1 }),
+      body: JSON.stringify({ ...full, pinned: a.pinned ? 0 : 1 }),
     });
     loadArticles();
   }
 
   async function confirmArchive(a: Article) {
+    const full = await fetchFull(a.id);
     await fetch(`/api/admin/articles/${a.id}`, {
       method: 'PUT', headers: authHeaders(token),
       body: JSON.stringify({
-        ...a,
+        ...full,
         archived: 1,
         archived_at: new Date().toISOString(),
         archive_reason: archiveReason.trim() || null,
@@ -109,9 +117,10 @@ export default function Admin() {
   }
 
   async function unarchive(a: Article) {
+    const full = await fetchFull(a.id);
     await fetch(`/api/admin/articles/${a.id}`, {
       method: 'PUT', headers: authHeaders(token),
-      body: JSON.stringify({ ...a, archived: 0, archived_at: null, archive_reason: null }),
+      body: JSON.stringify({ ...full, archived: 0, archived_at: null, archive_reason: null }),
     });
     loadArticles();
   }

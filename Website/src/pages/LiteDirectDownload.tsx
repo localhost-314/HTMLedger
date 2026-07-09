@@ -26,17 +26,18 @@ export default function LiteDirectDownload() {
           <div className="direct-dl-modal" onClick={e => e.stopPropagation()}>
             <h2 className="direct-dl-modal-title">Heads up before you download</h2>
             <p className="direct-dl-modal-body">
-              Direct downloads do not receive automatic updates. HTMLedger Lite is coming to the
-              Microsoft Store soon — once available, Store installs will update automatically.
+              Direct downloads do not receive automatic updates. To get the latest version automatically,
+              install HTMLedger Lite from the Microsoft Store instead.
             </p>
             <div className="direct-dl-modal-badge">
-              <div className="dl-store-coming-soon" style={{ margin: '0 auto' }}>
-                <span className="dl-store-coming-icon">🏪</span>
-                <div>
-                  <div className="dl-store-coming-title">Microsoft Store</div>
-                  <div className="dl-store-coming-sub">Coming soon &mdash; <a href="https://htmledger.localhost314.com/articles/lite-ms-store-status" target="_blank" rel="noopener noreferrer" className="dl-store-status-link">Status Updates</a></div>
-                </div>
-              </div>
+              <ms-store-badge
+                productid="9NFD2K13FB56"
+                window-mode="direct"
+                theme="dark"
+                size="large"
+                language="en-us"
+                animation="on"
+              />
             </div>
             <div className="direct-dl-modal-actions">
               <button className="btn btn-ghost" onClick={() => setShowWarning(false)}>Cancel</button>
@@ -96,8 +97,8 @@ export default function LiteDirectDownload() {
             </div>
 
             <div className="direct-dl-store-nudge">
-              <p>HTMLedger Lite is coming to the Microsoft Store soon.</p>
-              <Link to="/lite/download" className="direct-dl-store-link">← Back to download page</Link>
+              <p>Want automatic updates and no SmartScreen warnings?</p>
+              <Link to="/lite/download" className="direct-dl-store-link">← Get it from the Microsoft Store instead</Link>
             </div>
           </div>
         </div>

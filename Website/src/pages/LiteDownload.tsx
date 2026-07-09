@@ -19,13 +19,14 @@ export default function LiteDownload() {
           </p>
 
           <div className="dl-main-btns">
-            <div className="dl-store-coming-soon">
-              <span className="dl-store-coming-icon">🏪</span>
-              <div>
-                <div className="dl-store-coming-title">Microsoft Store</div>
-                <div className="dl-store-coming-sub">Coming soon &mdash; <a href="https://htmledger.localhost314.com/articles/lite-ms-store-status" target="_blank" rel="noopener noreferrer" className="dl-store-status-link">Status Updates</a></div>
-              </div>
-            </div>
+            <a
+              href="https://apps.microsoft.com/detail/9NFD2K13FB56?referrer=appbadge&mode=full"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="dl-main-btn-store"
+            >
+              <img src="https://get.microsoft.com/images/en-us%20dark.svg" alt="Get it from Microsoft" />
+            </a>
             <a href={GITHUB_URL} className="dl-main-btn-github" target="_blank" rel="noopener noreferrer">
               <img src="/GitHub_Invertocat_White.png" alt="GitHub" className="dl-github-logo" />
               View source code on GitHub

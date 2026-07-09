@@ -109,8 +109,14 @@ export default function Home() {
                 <li><span className="hub-check hub-check--lite">✓</span> Faster startup, smaller install</li>
                 <li><span className="hub-check hub-check--lite">✓</span> Portable build — no install needed</li>
               </ul>
-              <div className="hub-card-btns">
-                <Link to="/lite/download" className="btn hub-lite-btn">↓ Download Lite Free</Link>
+              <div className="hub-card-btns hub-card-btns--store">
+                <a
+                  href="https://apps.microsoft.com/detail/9NFD2K13FB56?referrer=appbadge&mode=full"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img src="https://get.microsoft.com/images/en-us%20dark.svg" alt="Get it from Microsoft" className="hub-store-badge" />
+                </a>
                 <Link to="/lite" className="btn btn-ghost">Explore →</Link>
               </div>
               <a href="https://github.com/localhost-314/HTMLedger" className="hub-card-oss hub-card-oss--lite" target="_blank" rel="noopener noreferrer">

@@ -5,7 +5,7 @@ interface Env { CMS: D1Database; ADMIN_PASSWORD: string; }
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   if (!authed(request, env)) return unauthorized();
   const { results } = await env.CMS.prepare(
-    'SELECT id, slug, title, summary, style, pinned, archived, published, created_at FROM articles ORDER BY pinned DESC, created_at DESC'
+    'SELECT id, slug, title, summary, style, pinned, archived, archived_at, archive_reason, published, created_at FROM articles ORDER BY pinned DESC, created_at DESC'
   ).all();
   return Response.json(results);
 };
