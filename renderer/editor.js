@@ -112,16 +112,22 @@ require(['vs/editor/editor.main'], async function() {
     });
   }
   // Restore session (previously open tabs) if no file was passed via argv
-  if (workspaceFolders.length > 0 && tabs.length === 0) {
-    window.api.getSession && window.api.getSession().then(async sess => {
-      if (sess && sess.tabs && sess.activeTab) {
-        for (const p of sess.tabs) {
-          try { await openTab(p); } catch {}
+  if (workspaceFolders.length > 0 && tabs.length === 0 && window.api.getSession) {
+    try {
+      const sess = await window.api.getSession();
+      if (sess && Array.isArray(sess.tabs) && sess.tabs.length > 0) {
+        const overlay = document.getElementById('session-loading');
+        const label   = document.getElementById('session-loading-label');
+        if (overlay) overlay.style.display = 'flex';
+        for (let i = 0; i < sess.tabs.length; i++) {
+          if (label) label.textContent = `Restoring session… (${i + 1}/${sess.tabs.length})`;
+          try { await openTab(sess.tabs[i]); } catch {}
         }
         const found = tabs.find(t => t.path === sess.activeTab);
         if (found) switchTab(found);
+        if (overlay) overlay.style.display = 'none';
       }
-    }).catch(() => {});
+    } catch {}
   }
   updateEmptyState();
   try { loadWorkspaceSidebar(); } catch(e) {}
@@ -2360,6 +2366,7 @@ function bindEvents() {
   document.getElementById('btn-back').onclick = () => {
     const dirty = tabs.filter(t => t.isDirty);
     if (dirty.length > 0 && !confirm(`${dirty.length} file(s) have unsaved changes. Leave anyway?`)) return;
+    sessionStorage.setItem('user-navigated-back', '1');
     window.location.href = 'home.html';
   };
 

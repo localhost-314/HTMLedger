@@ -342,6 +342,12 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
+  <!-- Session restore loading overlay -->
+  <div id="session-loading" style="display:none;position:fixed;inset:0;z-index:99999;background:var(--bg-primary);flex-direction:column;align-items:center;justify-content:center;gap:14px">
+    <div class="session-loading-spinner"></div>
+    <span style="font-size:13px;color:var(--text-secondary)" id="session-loading-label">Restoring session…</span>
+  </div>
+
   <!-- Sidebar context menu -->
   <div class="ctx-menu" id="sidebar-ctx" style="display:none;position:fixed;z-index:9999">
     <div class="ctx-item" id="sctx-open">Open</div>

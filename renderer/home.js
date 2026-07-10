@@ -898,6 +898,11 @@ function initCompat() {
 
 /* ── Restore workspace on launch ── */
 async function applyRestoreOnLaunch() {
+  // Skip auto-restore when the user explicitly navigated back from the editor
+  if (sessionStorage.getItem('user-navigated-back')) {
+    sessionStorage.removeItem('user-navigated-back');
+    return;
+  }
   try {
     const s = await window.api.getSettings();
     if (s.restoreWorkspace === 'last') {
