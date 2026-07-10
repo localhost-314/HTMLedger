@@ -7,6 +7,7 @@ interface Article {
   published: number; created_at: string;
 }
 interface Banner { message: string; type: 'info' | 'warning' | 'success'; linkUrl?: string; linkText?: string; }
+interface Plan { id: number; title: string; description: string; status: 'planned' | 'in-progress' | 'done'; sort_order: number; }
 
 const TOKEN_KEY = 'admin-token';
 
@@ -18,7 +19,7 @@ export default function Admin() {
   const [token, setToken] = useState(() => sessionStorage.getItem(TOKEN_KEY) ?? '');
   const [pwInput, setPwInput] = useState('');
   const [loginErr, setLoginErr] = useState(false);
-  const [tab, setTab] = useState<'banner' | 'articles'>('banner');
+  const [tab, setTab] = useState<'banner' | 'articles' | 'upcoming'>('banner');
 
   // Banner state
   const [banner, setBanner] = useState<Banner>({ message: '', type: 'info', linkUrl: '', linkText: '' });
@@ -33,6 +34,11 @@ export default function Admin() {
   // Archive modal state
   const [archiving, setArchiving] = useState<Article | null>(null);
   const [archiveReason, setArchiveReason] = useState('');
+
+  // Upcoming plans state
+  const [plans, setPlans]           = useState<Plan[]>([]);
+  const [editingPlan, setEditingPlan] = useState<Partial<Plan> | null>(null);
+  const [isNewPlan, setIsNewPlan]   = useState(false);
 
   // Image upload
   const fileRef = useRef<HTMLInputElement>(null);
@@ -131,6 +137,26 @@ export default function Admin() {
     loadArticles();
   }
 
+  async function loadPlans() {
+    const res = await fetch('/api/admin/upcoming', { headers: authHeaders(token) });
+    setPlans(await res.json());
+  }
+
+  async function savePlan() {
+    if (!editingPlan) return;
+    const url    = isNewPlan ? '/api/admin/upcoming' : `/api/admin/upcoming/${editingPlan.id}`;
+    const method = isNewPlan ? 'POST' : 'PUT';
+    await fetch(url, { method, headers: authHeaders(token), body: JSON.stringify(editingPlan) });
+    setEditingPlan(null);
+    loadPlans();
+  }
+
+  async function deletePlan(id: number) {
+    if (!confirm('Delete this plan?')) return;
+    await fetch(`/api/admin/upcoming/${id}`, { method: 'DELETE', headers: authHeaders(token) });
+    loadPlans();
+  }
+
   async function uploadImage(file: File) {
     setUploading(true); setUploadedUrl('');
     const fd = new FormData();
@@ -147,7 +173,7 @@ export default function Admin() {
 
   useEffect(() => {
     if (!token) return;
-    loadBanner(); loadArticles();
+    loadBanner(); loadArticles(); loadPlans();
   }, [token]);
 
   if (!token) {
@@ -206,6 +232,7 @@ export default function Admin() {
       <div className="admin-tabs">
         <button className={`admin-tab ${tab === 'banner' ? 'active' : ''}`} onClick={() => setTab('banner')}>Banner</button>
         <button className={`admin-tab ${tab === 'articles' ? 'active' : ''}`} onClick={() => setTab('articles')}>Articles</button>
+        <button className={`admin-tab ${tab === 'upcoming' ? 'active' : ''}`} onClick={() => setTab('upcoming')}>Upcoming</button>
       </div>
 
       <div className="admin-body">
@@ -364,6 +391,68 @@ export default function Admin() {
             <div className="admin-actions">
               <button className="btn btn-primary" onClick={saveArticle}>Save</button>
               <button className="admin-btn-sm" onClick={() => setEditing(null)}>Cancel</button>
+            </div>
+          </div>
+        )}
+
+        {tab === 'upcoming' && !editingPlan && (
+          <div className="admin-section">
+            <div className="admin-section-header">
+              <h2>Upcoming Features</h2>
+              <button className="btn btn-primary btn-sm" onClick={() => { setIsNewPlan(true); setEditingPlan({ title: '', description: '', status: 'planned', sort_order: plans.length + 1 }); }}>
+                + New Plan
+              </button>
+            </div>
+            {plans.length === 0 && <p className="admin-empty">No plans yet.</p>}
+            <div className="admin-article-list">
+              {plans.map(p => (
+                <div key={p.id} className="admin-article-row">
+                  <div className="admin-article-info">
+                    <span className="admin-article-title">{p.title}</span>
+                    <span className="admin-article-meta">#{p.sort_order} · {p.status}</span>
+                  </div>
+                  <div className="admin-article-actions">
+                    <span className={`admin-badge ${p.status === 'in-progress' ? 'admin-badge--green' : p.status === 'done' ? '' : ''}`}>
+                      {p.status === 'in-progress' ? 'In Progress' : p.status === 'done' ? 'Done' : 'Planned'}
+                    </span>
+                    <button className="admin-btn-sm" onClick={() => { setIsNewPlan(false); setEditingPlan({ ...p }); }}>Edit</button>
+                    <button className="admin-btn-sm admin-btn-sm--danger" onClick={() => deletePlan(p.id)}>Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tab === 'upcoming' && editingPlan && (
+          <div className="admin-section">
+            <div className="admin-section-header">
+              <h2>{isNewPlan ? 'New Plan' : 'Edit Plan'}</h2>
+              <button className="admin-btn-sm" onClick={() => setEditingPlan(null)}>← Back</button>
+            </div>
+            <div className="admin-field">
+              <label>Title</label>
+              <input className="admin-input" value={editingPlan.title ?? ''} onChange={e => setEditingPlan(p => ({ ...p!, title: e.target.value }))} placeholder="e.g. Git Integration" />
+            </div>
+            <div className="admin-field">
+              <label>Description</label>
+              <textarea className="admin-input admin-textarea" rows={4} value={editingPlan.description ?? ''} onChange={e => setEditingPlan(p => ({ ...p!, description: e.target.value }))} placeholder="What will this feature do?" />
+            </div>
+            <div className="admin-field">
+              <label>Status</label>
+              <select className="admin-input" value={editingPlan.status ?? 'planned'} onChange={e => setEditingPlan(p => ({ ...p!, status: e.target.value as Plan['status'] }))}>
+                <option value="planned">Planned</option>
+                <option value="in-progress">In Progress</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+            <div className="admin-field">
+              <label>Sort Order</label>
+              <input className="admin-input" type="number" value={editingPlan.sort_order ?? 0} onChange={e => setEditingPlan(p => ({ ...p!, sort_order: Number(e.target.value) }))} />
+            </div>
+            <div className="admin-actions">
+              <button className="btn btn-primary" onClick={savePlan}>Save</button>
+              <button className="admin-btn-sm" onClick={() => setEditingPlan(null)}>Cancel</button>
             </div>
           </div>
         )}

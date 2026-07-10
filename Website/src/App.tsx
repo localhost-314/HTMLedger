@@ -24,6 +24,8 @@ import Article from './pages/Article';
 import ArchivedArticles from './pages/ArchivedArticles';
 import DirectDownload from './pages/DirectDownload';
 import LiteDirectDownload from './pages/LiteDirectDownload';
+import Upcoming from './pages/Upcoming';
+import FeatureRequest from './pages/FeatureRequest';
 import NotFound from './pages/NotFound';
 
 function ScrollToTop() {
@@ -77,6 +79,8 @@ function AppShell({ dlOpen, dlHint, dlStartQuiz, openDl, openQuiz, onClose }: {
           <Route path="/articles/archives" element={<ArchivedArticles />} />
           <Route path="/articles/archives/:slug" element={<Article archived />} />
           <Route path="/articles/:slug" element={<Article />} />
+          <Route path="/upcoming" element={<Upcoming />} />
+          <Route path="/upcoming/request" element={<FeatureRequest />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/main/download/direct" element={<DirectDownload />} />
           <Route path="/lite/download/direct" element={<LiteDirectDownload />} />

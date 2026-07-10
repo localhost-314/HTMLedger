@@ -108,6 +108,10 @@ export default function Navbar() {
                   <span className="nav-drop-label">All Features</span>
                   <span className="nav-drop-desc">Full feature list by category</span>
                 </Link>
+                <Link to="/upcoming" className="nav-drop-item">
+                  <span className="nav-drop-label">Upcoming Features</span>
+                  <span className="nav-drop-desc">What we're building next</span>
+                </Link>
               </DropMenu>
             </div>
 
@@ -236,6 +240,7 @@ export default function Navbar() {
           <Link to="/main" className="mobile-menu-row" onClick={closeMobile}>Features</Link>
           <Link to="/main/download" className="mobile-menu-row" onClick={closeMobile}>Download</Link>
           <Link to="/main/features" className="mobile-menu-row" onClick={closeMobile}>All Features</Link>
+          <Link to="/upcoming" className="mobile-menu-row" onClick={closeMobile}>Upcoming Features</Link>
         </div>
 
         {/* Lite sub-level */}
