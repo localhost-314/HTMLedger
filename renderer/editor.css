@@ -249,6 +249,33 @@ html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui,
 .status-center { font-size: 10px; opacity: 0.75; }
 .status-right  { white-space: nowrap; opacity: 0.8; }
 
+/* ── Snippets settings tab ── */
+.usp-snip-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:32px 16px; text-align:center; color:var(--text-secondary); }
+.usp-snip-add-btn { font-size:12px; font-weight:600; color:var(--accent); background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.3); border-radius:6px; padding:4px 12px; cursor:pointer; transition:background .15s; }
+.usp-snip-add-btn:hover { background:rgba(99,102,241,.2); }
+.usp-snip-list { display:flex; flex-direction:column; gap:6px; margin-bottom:6px; }
+.usp-snip-row { background:var(--bg-card); border:1px solid var(--border); border-radius:7px; overflow:hidden; }
+.usp-snip-row-top { display:flex; align-items:center; gap:8px; padding:8px 10px; }
+.usp-snip-cat-badge { font-size:10px; font-weight:700; letter-spacing:.04em; background:rgba(99,102,241,.15); color:var(--accent); border-radius:4px; padding:2px 6px; flex-shrink:0; }
+.usp-snip-lbl { flex:1; font-size:13px; font-weight:500; color:var(--text-primary); }
+.usp-snip-row-actions { display:flex; gap:4px; flex-shrink:0; }
+.usp-snip-action-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:13px; padding:2px 5px; border-radius:4px; transition:background .15s,color .15s; }
+.usp-snip-action-btn:hover { background:var(--bg-hover); color:var(--text-primary); }
+.u-sd:hover { color:#f87171 !important; }
+.usp-snip-code-preview { font-family:'Cascadia Code','Fira Code',Consolas,monospace; font-size:11px; color:var(--text-muted); background:var(--bg-primary); border-top:1px solid var(--border); padding:6px 10px; white-space:pre; overflow:hidden; line-height:1.4; }
+/* Snippet form */
+.usp-snip-form { background:var(--bg-card); border:1px solid var(--accent); border-radius:8px; padding:14px; margin:8px 0; display:flex; flex-direction:column; gap:4px; }
+.usp-snip-form-title { font-size:12px; font-weight:700; color:var(--accent); letter-spacing:.04em; text-transform:uppercase; margin-bottom:4px; }
+.usp-row--col { flex-direction:column; align-items:flex-start; gap:6px; }
+.usp-row--col .usp-lbl { width:auto; }
+.usp-input { background:var(--bg-primary); border:1px solid var(--border); color:var(--text-primary); border-radius:6px; padding:6px 10px; font-size:13px; font-family:inherit; width:100%; box-sizing:border-box; outline:none; transition:border-color .15s; }
+.usp-input:focus { border-color:var(--accent); }
+.usp-snip-textarea { background:var(--bg-primary); border:1px solid var(--border); color:var(--text-primary); border-radius:6px; padding:8px 10px; font-size:12px; font-family:'Cascadia Code','Fira Code',Consolas,monospace; width:100%; box-sizing:border-box; resize:vertical; outline:none; line-height:1.5; transition:border-color .15s; }
+.usp-snip-textarea:focus { border-color:var(--accent); }
+.usp-snip-form-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:6px; }
+/* Custom snippet indicator in snippet panel */
+.snip-item--custom::after { content:'★'; font-size:9px; margin-left:5px; opacity:.5; }
+
 /* ── Session loading ── */
 .session-loading-spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }

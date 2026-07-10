@@ -94,4 +94,8 @@ contextBridge.exposeInMainWorld('api', {
 
   // Copy file (duplicate)
   copyFile: (src, dest) => ipcRenderer.invoke('copy-file', src, dest),
+
+  // Custom snippets
+  getCustomSnippets:  ()      => ipcRenderer.invoke('get-custom-snippets'),
+  saveCustomSnippets: (snips) => ipcRenderer.invoke('save-custom-snippets', snips),
 });

@@ -50,6 +50,7 @@ let previewMode        = 'server';
 let previewServerPort  = null;
 let recentlyClosed     = [];
 let deviceFrame        = 'none'; // 'none' | 'mobile' | 'tablet'
+let customSnippets     = [];
 
 // Default app-level keybindings (normalized lowercase)
 const DEFAULT_BINDINGS = {
@@ -101,6 +102,9 @@ const SNIPPETS = {
 require.config({ paths: { vs: '../node_modules/monaco-editor/min/vs' } });
 require(['vs/editor/editor.main'], async function() {
   await Promise.all([initEmmet(), loadAndApplySettings()]);
+  if (window.api.getCustomSnippets) {
+    customSnippets = (await window.api.getCustomSnippets()) || [];
+  }
   defineTheme();
   createEditor();
   installWidgetBoundsFix();
@@ -536,14 +540,23 @@ function tryExpandEmmet() {
 function buildSnippetPanel() {
   const list = document.getElementById('snip-list');
   list.innerHTML = '';
-  Object.entries(SNIPPETS).forEach(([cat, items]) => {
+
+  // Merge custom snippets into their categories
+  const merged = {};
+  Object.entries(SNIPPETS).forEach(([cat, items]) => { merged[cat] = [...items]; });
+  customSnippets.forEach(s => {
+    if (!merged[s.cat]) merged[s.cat] = [];
+    merged[s.cat].push({ key: 'custom-' + s.id, label: s.label, code: s.code, isCustom: true });
+  });
+
+  Object.entries(merged).forEach(([cat, items]) => {
     const sec = document.createElement('div');
     sec.className = 'snip-section';
     sec.textContent = cat;
     list.appendChild(sec);
     items.forEach(snip => {
       const btn = document.createElement('button');
-      btn.className = 'snip-item';
+      btn.className = 'snip-item' + (snip.isCustom ? ' snip-item--custom' : '');
       btn.textContent = snip.label;
       btn.dataset.key = snip.key;
       btn.addEventListener('click', () => { insertSnippet(snip.code); closeSnippetsPanel(); });
@@ -551,6 +564,11 @@ function buildSnippetPanel() {
     });
   });
 }
+
+document.addEventListener('snippets-changed', async () => {
+  customSnippets = (await window.api.getCustomSnippets()) || [];
+  buildSnippetPanel();
+});
 
 function toggleSnippetsPanel() {
   snippetsPanelOpen = !snippetsPanelOpen;

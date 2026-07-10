@@ -5,6 +5,7 @@
   let _cfg     = {};
   let _ws      = [];
   let _wsId    = null;
+  let _snips   = [];
 
   const FONTS = [
     { val: "'Cascadia Code','Fira Code',Consolas,monospace", label: 'Cascadia Code'  },
@@ -79,6 +80,7 @@
           <button class="usp-tab" data-t="editor">Editor</button>
           <button class="usp-tab" data-t="app">App</button>
           <button class="usp-tab" data-t="workspace">Workspace</button>
+          <button class="usp-tab" data-t="snippets">Snippets</button>
           <button class="usp-tab" data-t="shortcuts">Shortcuts</button>
         </div>
         <div class="usp-body" id="usp-body"></div>
@@ -105,6 +107,13 @@
     if      (t === 'editor')    { body.innerHTML = _editorHtml();    _bindEditor();    }
     else if (t === 'app')       { body.innerHTML = _appHtml();       _bindApp();       }
     else if (t === 'workspace') { body.innerHTML = _wsHtml();        _bindWs();        }
+    else if (t === 'snippets')  {
+      window.api.getCustomSnippets().then(s => {
+        _snips = s || [];
+        body.innerHTML = _snippetsHtml();
+        _bindSnippets();
+      });
+    }
     else                        { body.innerHTML = _shortcutsHtml(); _bindShortcuts(); }
   }
 
@@ -624,6 +633,149 @@
         container.appendChild(row);
       }
     }
+  }
+
+  /* ── Snippets tab ─────────────────────────────────────────────────── */
+  const BUILT_IN_CATS = ['HTML', 'CSS', 'JS'];
+
+  function _snippetsHtml() {
+    const empty = _snips.length === 0;
+    const rows = _snips.map((s, i) => `
+      <div class="usp-snip-row">
+        <div class="usp-snip-row-top">
+          <span class="usp-snip-cat-badge">${_esc(s.cat)}</span>
+          <span class="usp-snip-lbl">${_esc(s.label)}</span>
+          <div class="usp-snip-row-actions">
+            <button class="usp-snip-action-btn u-se" data-i="${i}" title="Edit">✎</button>
+            <button class="usp-snip-action-btn u-sd" data-i="${i}" title="Delete">✕</button>
+          </div>
+        </div>
+        <div class="usp-snip-code-preview">${_esc((s.code || '').split('\n').slice(0, 2).join('\n'))}${(s.code || '').split('\n').length > 2 ? '\n…' : ''}</div>
+      </div>`).join('');
+    return `
+      <div class="usp-section-label" style="display:flex;align-items:center;justify-content:space-between">
+        <span>CUSTOM SNIPPETS${_snips.length ? ' (' + _snips.length + ')' : ''}</span>
+        <button class="usp-snip-add-btn" id="u-snip-add">+ Add Snippet</button>
+      </div>
+      ${empty ? `<div class="usp-snip-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;opacity:.4"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+        <p>No custom snippets yet.</p>
+        <p style="font-size:11px;color:var(--text-muted)">Custom snippets appear in the Snippets panel alongside the built-ins.</p>
+      </div>` : `<div class="usp-snip-list" id="u-snip-list">${rows}</div>`}
+      <div id="u-snip-form-wrap"></div>`;
+  }
+
+  function _snipFormHtml(snip) {
+    const label    = snip ? _esc(snip.label) : '';
+    const code     = snip ? _esc(snip.code)  : '';
+    const curCat   = snip ? snip.cat : 'HTML';
+    const isCustom = !BUILT_IN_CATS.includes(curCat);
+    const catBtns  = BUILT_IN_CATS.map(c =>
+      `<button class="usp-chip${curCat===c?' on':''}" data-v="${c}">${c}</button>`
+    ).join('') + `<button class="usp-chip${isCustom?' on':''}" data-v="__custom">Other</button>`;
+    return `
+      <div class="usp-snip-form">
+        <div class="usp-snip-form-title">${snip ? 'Edit Snippet' : 'New Snippet'}</div>
+        <div class="usp-row">
+          <label class="usp-lbl">Name</label>
+          <input class="usp-input" id="u-sf-label" value="${label}" placeholder="e.g. Flex Center" autocomplete="off">
+        </div>
+        <div class="usp-row">
+          <label class="usp-lbl">Category</label>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div class="usp-chips" id="u-sf-cats">${catBtns}</div>
+            <input class="usp-input" id="u-sf-cat-custom" value="${isCustom ? _esc(curCat) : ''}"
+              placeholder="Category name" style="${isCustom ? '' : 'display:none'}">
+          </div>
+        </div>
+        <div class="usp-row usp-row--col">
+          <label class="usp-lbl">
+            Code
+            <small class="usp-hint">Use \${1:placeholder} for tab stops, $0 for final cursor</small>
+          </label>
+          <textarea class="usp-snip-textarea" id="u-sf-code" rows="7" spellcheck="false"
+            placeholder="Paste your snippet here…">${code}</textarea>
+        </div>
+        <div class="usp-snip-form-actions">
+          <button class="usp-btn-sec" id="u-sf-cancel">Cancel</button>
+          <button class="usp-btn-pri" id="u-sf-save">${snip ? 'Update Snippet' : 'Save Snippet'}</button>
+        </div>
+      </div>`;
+  }
+
+  function _bindSnippets() {
+    const body   = _overlay.querySelector('#usp-body');
+    let selCat   = 'HTML';
+    let editIdx  = null;
+
+    function showForm(snip, idx) {
+      editIdx = idx ?? null;
+      selCat  = snip ? snip.cat : 'HTML';
+      const wrap = _q('#u-snip-form-wrap');
+      if (!wrap) return;
+      wrap.innerHTML = _snipFormHtml(snip);
+
+      // Category chip group
+      const catGroup = _q('#u-sf-cats');
+      if (catGroup) {
+        catGroup.querySelectorAll('.usp-chip').forEach(btn => {
+          btn.onclick = () => {
+            catGroup.querySelectorAll('.usp-chip').forEach(b => b.classList.remove('on'));
+            btn.classList.add('on');
+            const customInp = _q('#u-sf-cat-custom');
+            if (btn.dataset.v === '__custom') {
+              customInp.style.display = '';
+              customInp.focus();
+              selCat = customInp.value || '';
+            } else {
+              selCat = btn.dataset.v;
+              customInp.style.display = 'none';
+            }
+          };
+        });
+      }
+      _on('#u-sf-cat-custom', 'input', e => { selCat = e.target.value.trim(); });
+
+      _on('#u-sf-cancel', 'click', () => { wrap.innerHTML = ''; editIdx = null; });
+
+      _on('#u-sf-save', 'click', async () => {
+        const label = (_q('#u-sf-label')?.value || '').trim();
+        const code  = (_q('#u-sf-code')?.value || '').trim();
+        const cat   = selCat || 'Custom';
+        if (!label) { _q('#u-sf-label')?.focus(); return; }
+        if (!code)  { _q('#u-sf-code')?.focus();  return; }
+        if (editIdx !== null) {
+          _snips[editIdx] = { ..._snips[editIdx], label, cat, code };
+        } else {
+          _snips.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), cat, label, code });
+        }
+        await window.api.saveCustomSnippets(_snips);
+        document.dispatchEvent(new CustomEvent('snippets-changed'));
+        body.innerHTML = _snippetsHtml();
+        _bindSnippets();
+      });
+
+      wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      _q('#u-sf-label')?.focus();
+    }
+
+    _on('#u-snip-add', 'click', () => showForm(null, null));
+
+    body.querySelectorAll('.u-se').forEach(btn => {
+      btn.onclick = () => showForm(_snips[+btn.dataset.i], +btn.dataset.i);
+    });
+
+    body.querySelectorAll('.u-sd').forEach(btn => {
+      btn.onclick = async () => {
+        const i = +btn.dataset.i;
+        if (!confirm(`Delete "${_snips[i].label}"?`)) return;
+        _snips.splice(i, 1);
+        await window.api.saveCustomSnippets(_snips);
+        document.dispatchEvent(new CustomEvent('snippets-changed'));
+        body.innerHTML = _snippetsHtml();
+        _bindSnippets();
+      };
+    });
   }
 
   /* ── Shortcuts tab ────────────────────────────────────────────────── */

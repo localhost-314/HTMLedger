@@ -486,6 +486,16 @@ ipcMain.handle('save-session', async (event, data) => {
   return { success: true };
 });
 
+// --- Custom snippets ---
+ipcMain.handle('get-custom-snippets', async () => {
+  try { return JSON.parse(fs.readFileSync(path.join(app.getPath('userData'), 'custom-snippets.json'), 'utf8')); }
+  catch { return []; }
+});
+ipcMain.handle('save-custom-snippets', async (event, snips) => {
+  fs.writeFileSync(path.join(app.getPath('userData'), 'custom-snippets.json'), JSON.stringify(snips, null, 2), 'utf8');
+  return { success: true };
+});
+
 // --- Copy file (for Duplicate) ---
 ipcMain.handle('copy-file', async (event, srcPath, destPath) => {
   try { fs.copyFileSync(srcPath, destPath); return { success: true }; }
